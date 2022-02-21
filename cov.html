@@ -1,0 +1,749 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>persistent: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/scottwis/persistent/common.go (82.4%)</option>
+				
+				<option value="file1">github.com/scottwis/persistent/set.go (100.0%)</option>
+				
+				<option value="file2">github.com/scottwis/persistent/tree.go (87.1%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package persistent
+
+import (
+        "constraints"
+        "encoding/json"
+        "fmt"
+        "reflect"
+        "strings"
+        "unsafe"
+)
+
+type Comparable[T any] interface {
+        Equal(rhs T) bool
+        comparable
+}
+
+type Ordered[T any] interface {
+        Comparable[T]
+        Less(rhs T) bool
+}
+
+type Key[T constraints.Ordered] struct {
+        Key T
+}
+
+func (lhs Key[T]) Less(rhs Key[T]) bool <span class="cov8" title="1">{
+        return lhs.Key &lt; rhs.Key
+}</span>
+
+func (lhs Key[T]) Equal(rhs Key[T]) bool <span class="cov8" title="1">{
+        return lhs.Key == rhs.Key
+}</span>
+
+func AsKey[T constraints.Ordered](key T) Key[T] <span class="cov8" title="1">{
+        return Key[T]{Key: key}
+}</span>
+
+func (lhs Key[T]) MarshalText() (text []byte, err error) <span class="cov8" title="1">{
+        //Key[T] only works for types satisfying the ordered constraint
+        return []byte(fmt.Sprint(lhs.Key)), nil
+}</span>
+
+func (lhs *Key[T]) UnmarshalText(text []byte) error <span class="cov8" title="1">{
+        v := reflect.ValueOf(&amp;lhs.Key)
+        if v.Kind() == reflect.String </span><span class="cov0" title="0">{
+                *(*string)(unsafe.Pointer(&amp;lhs.Key)) = string(text)
+        }</span>
+
+        <span class="cov8" title="1">_, err := fmt.Sscanf(string(text), "%v", &amp;lhs.Key)
+        return err</span>
+}
+
+func (lhs *Key[T]) UnmarshalJSON(data []byte) error <span class="cov8" title="1">{
+        s := strings.TrimSpace(string(data))
+        if s != "" &amp;&amp; s[0] == '"' </span><span class="cov8" title="1">{
+                var s string
+                err := json.Unmarshal(data, &amp;s)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return lhs.UnmarshalText([]byte(s))</span>
+        }
+        <span class="cov0" title="0">return json.Unmarshal(data, &amp;lhs.Key)</span>
+}
+
+// Iterator defines an interface for an iterator of a persistent data structure.
+//
+// It is safe to use multiple iterators over the same data structure concurrently. A single
+// Iterator instance, however, is not concurrency safe. Sharing an iterator instance between go-routines requires
+// explicit synchronization.
+//
+// Example:
+//    var iter = tree.Iterator()
+//    for iter.Next() {
+//        fmt.Println(iter.Current())
+//    }
+type Iterator[T any] interface {
+        //Next advances the iterator by one position, and returns true iif the new position is valid.
+        Next() bool
+
+        //Current returns the value at the current iterator position. Will panic if the iterator position is invalid.
+        Current() T
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package persistent
+
+type Set[T Ordered[T]] struct {
+        tree *Tree[T, bool]
+}
+
+func (s *Set[T]) Contains(elem T) bool <span class="cov8" title="1">{
+        var currentRoot *Tree[T, bool]
+        if s != nil </span><span class="cov8" title="1">{
+                currentRoot = s.tree
+        }</span>
+        <span class="cov8" title="1">return !currentRoot.Find(elem).IsEmpty()</span>
+}
+
+func (s *Set[T]) Remove(elem T) *Set[T] <span class="cov8" title="1">{
+        var currentRoot *Tree[T, bool]
+        if s != nil </span><span class="cov8" title="1">{
+                currentRoot = s.tree
+        }</span>
+
+        <span class="cov8" title="1">newRoot := currentRoot.Delete(elem)
+        if newRoot != currentRoot </span><span class="cov8" title="1">{
+                return &amp;Set[T]{tree: newRoot}
+        }</span>
+        <span class="cov8" title="1">return s</span>
+}
+
+func (s *Set[T]) Add(elem T) *Set[T] <span class="cov8" title="1">{
+        if s.Contains(elem) </span><span class="cov8" title="1">{
+                return s
+        }</span>
+        <span class="cov8" title="1">var currentRoot *Tree[T, bool]
+        if s != nil </span><span class="cov8" title="1">{
+                currentRoot = s.tree
+        }</span>
+
+        <span class="cov8" title="1">return &amp;Set[T]{
+                tree: currentRoot.Update(elem, true),
+        }</span>
+}
+
+func (s *Set[T]) LeastUpperBound(value T) (T, bool) <span class="cov8" title="1">{
+        if s == nil </span><span class="cov8" title="1">{
+                var ret T
+                return ret, false
+        }</span>
+
+        <span class="cov8" title="1">n := s.tree.LeastUpperBound(value)
+        return n.Key(), !n.IsEmpty()</span>
+}
+
+func (s *Set[T]) GreatestLowerBound(value T) (T, bool) <span class="cov8" title="1">{
+        if s == nil </span><span class="cov8" title="1">{
+                var ret T
+                return ret, false
+        }</span>
+
+        <span class="cov8" title="1">n := s.tree.GreatestLowerBound(value)
+        return n.Key(), !n.IsEmpty()</span>
+}
+
+func (s *Set[T]) Size() int <span class="cov8" title="1">{
+        if s == nil </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return s.tree.Size()</span>
+}
+
+func (s *Set[T]) Iter() Iterator[T] <span class="cov8" title="1">{
+        var currentRoot *Tree[T, bool]
+        if s != nil </span><span class="cov8" title="1">{
+                currentRoot = s.tree
+        }</span>
+        <span class="cov8" title="1">return &amp;setIterator[T]{wrapped: currentRoot.Iter()}</span>
+}
+
+func (s *Set[T]) IterGte(elem T) Iterator[T] <span class="cov8" title="1">{
+        var currentRoot *Tree[T, bool]
+        if s != nil </span><span class="cov8" title="1">{
+                currentRoot = s.tree
+        }</span>
+        <span class="cov8" title="1">return &amp;setIterator[T]{wrapped: currentRoot.IterGte(elem)}</span>
+}
+
+func (s *Set[T]) IsEmpty() bool <span class="cov8" title="1">{
+        return s == nil || s.tree.IsEmpty()
+}</span>
+
+func EmptySet[T Ordered[T]]() *Set[T] <span class="cov8" title="1">{
+        return nil
+}</span>
+
+type setIterator[T Ordered[T]] struct {
+        wrapped Iterator[Pair[T, bool]]
+}
+
+func (s *setIterator[T]) Next() bool <span class="cov8" title="1">{
+        return s.wrapped.Next()
+}</span>
+
+func (s *setIterator[T]) Current() T <span class="cov8" title="1">{
+        return s.wrapped.Current().Key()
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package persistent
+
+import "encoding/json"
+
+// Pair defines a key-value pair.
+type Pair[K any, V any] interface {
+        //Key returns the key stored in the pair. If the pair is empty, will return the 0 value for K.
+        Key() K
+        //Value returns the value stored in the pair. If the pair is empty, will return the 0 value of V.
+        Value() V
+        //IsEmpty returns true if the pair is empty.
+        IsEmpty() bool
+}
+
+// Tree implements a persistent AVL Tree.
+//
+// Persistent AVL trees are immutable. Each mutating operation will return the root of a new tree with the requested
+// update applied. The implementation uses structural sharing to make immutability efficient. For any given
+// update, at most O(log(n)) nodes will be replaced in the new tree. The implementation is also concurrency-safe
+// and non-blocking. A *Tree[K,V] instance may be accessed from multiple go-routines without synchronization. See the
+// docs for Iterator[K,V] for notes on current use of iterators.
+//
+// To create a tree use the EmptyTree[K,V]() methos.
+type Tree[K Ordered[K], V any] struct {
+        left   *Tree[K, V]
+        right  *Tree[K, V]
+        key    K
+        value  V
+        size   int
+        height int
+}
+
+type treeIterator[K Ordered[K], V any] struct {
+        stack   []*Tree[K, V]
+        current *Tree[K, V]
+}
+
+func EmptyTree[K Ordered[K], V any]() *Tree[K, V] <span class="cov8" title="1">{
+        return nil
+}</span>
+
+// Key returns the key stored in the root node of the tree. If the tree is empty, the zero value of K is returned.
+func (n *Tree[K, V]) Key() K <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                var ret K
+                return ret
+        }</span>
+        <span class="cov8" title="1">return n.key</span>
+}
+
+// Value returns the value stored in the root node of the tree. If the tree is empty, the zero value of V is returned.
+func (n *Tree[K, V]) Value() V <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                var ret V
+                return ret
+        }</span>
+        <span class="cov8" title="1">return n.value</span>
+}
+
+// IsEmpty returns true if the tree is currently empty, false otherwise
+func (n *Tree[K, V]) IsEmpty() bool <span class="cov8" title="1">{
+        return n == nil || n.size == 0
+}</span>
+
+// Find returns the pair associated with key in the tree. Will return an empty pair if no such item exists.
+func (n *Tree[K, V]) Find(key K) Pair[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Equal(key) </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Less(key) </span><span class="cov8" title="1">{
+                return n.right.Find(key)
+        }</span>
+
+        <span class="cov8" title="1">return n.left.Find(key)</span>
+}
+
+// Update returns the root of a new tree with the value for 'key' set to 'value'.
+func (n *Tree[K, V]) Update(key K, value V) *Tree[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return newNode(n, n, key, value)
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Equal(key) </span><span class="cov8" title="1">{
+                return newNode(n.left, n.right, key, value)
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Less(key) </span><span class="cov8" title="1">{
+                return newNode(n.left, n.right.Update(key, value), n.key, n.value).rebalance()
+        }</span>
+
+        <span class="cov8" title="1">return newNode(n.left.Update(key, value), n.right, n.key, n.value).rebalance()</span>
+}
+
+func newNode[K Ordered[K], V any](left *Tree[K, V], right *Tree[K, V], key K, value V) *Tree[K, V] <span class="cov8" title="1">{
+        return &amp;Tree[K, V]{
+                left:   left,
+                right:  right,
+                key:    key,
+                value:  value,
+                size:   left.Size() + right.Size() + 1,
+                height: max(left.Height(), right.Height()) + 1,
+        }
+}</span>
+
+func max(i, j int) int <span class="cov8" title="1">{
+        if i &gt; j </span><span class="cov8" title="1">{
+                return i
+        }</span>
+        <span class="cov8" title="1">return j</span>
+}
+
+func abs(i int) int <span class="cov8" title="1">{
+        if i &lt; 0 </span><span class="cov8" title="1">{
+                return -i
+        }</span>
+        <span class="cov8" title="1">return i</span>
+}
+
+func (n *Tree[K, V]) balanceFactor() int <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return n.right.Height() - n.left.Height()</span>
+}
+
+func (n *Tree[K, V]) Height() int <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return n.height</span>
+}
+
+func (n *Tree[K, V]) rebalance() *Tree[K, V] <span class="cov8" title="1">{
+        balance := n.balanceFactor()
+        if abs(balance) &lt;= 1 </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if balance &gt; 0 </span><span class="cov8" title="1">{
+                rightBalance := n.right.balanceFactor()
+
+                if rightBalance &gt; 0 </span><span class="cov8" title="1">{
+                        return n.rotateLeft()
+                }</span>
+
+                <span class="cov8" title="1">return n.rotateRightLeft()</span>
+        } else<span class="cov8" title="1"> {
+                leftBalance := n.left.balanceFactor()
+                if leftBalance &lt; 0 </span><span class="cov8" title="1">{
+                        return n.rotateRight()
+                }</span>
+
+                <span class="cov8" title="1">return n.rotateLeftRight()</span>
+        }
+}
+
+func (n *Tree[K, V]) rotateLeft() *Tree[K, V] <span class="cov8" title="1">{
+        return newNode(
+                newNode(n.left, n.right.left, n.key, n.value),
+                n.right.right,
+                n.right.key,
+                n.right.value,
+        )
+}</span>
+
+func (n *Tree[K, V]) rotateRight() *Tree[K, V] <span class="cov8" title="1">{
+        return newNode(
+                n.left.left,
+                newNode(n.left.right, n.right, n.key, n.value),
+                n.left.key,
+                n.left.value,
+        )
+}</span>
+
+func (n *Tree[K, V]) rotateRightLeft() *Tree[K, V] <span class="cov8" title="1">{
+        return newNode(
+                n.left,
+                n.right.rotateRight(),
+                n.key,
+                n.value,
+        ).rotateLeft()
+}</span>
+
+func (n *Tree[K, V]) rotateLeftRight() *Tree[K, V] <span class="cov8" title="1">{
+        return newNode(
+                n.left.rotateLeft(),
+                n.right,
+                n.key,
+                n.value,
+        ).rotateRight()
+}</span>
+
+// Left returns the left subtree of the current tree. Will never be nil. For empty nodes t.Left() == t.
+// If you are using Left() and Right() to traverse a tree, make sure to use IsEmpty() as your termination condition.
+func (n *Tree[K, V]) Left() *Tree[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+        <span class="cov8" title="1">return n.left</span>
+}
+
+// Right returns the right subtree of the current tree. Will never be nil. For empty nodes t.Left() == t.
+// If you are using Left() and Right() to traverse a tree, make sure to use IsEmpty() as your termination condition.
+func (n *Tree[K, V]) Right() *Tree[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+        <span class="cov8" title="1">return n.right</span>
+}
+
+// Delete returns the root of a new tree with the entry for 'key' removed.
+func (n *Tree[K, V]) Delete(key K) *Tree[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Equal(key) </span><span class="cov8" title="1">{
+                return n.deleteCurrent().rebalance()
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Less(key) </span><span class="cov8" title="1">{
+                r := n.right.Delete(key)
+                if r != n.right </span><span class="cov8" title="1">{
+                        return newNode(
+                                n.left,
+                                n.right.Delete(key),
+                                n.key,
+                                n.value,
+                        ).rebalance()
+                }</span>
+                <span class="cov8" title="1">return n</span>
+        }
+
+        <span class="cov8" title="1">l := n.left.Delete(key)
+        if l != n.left </span><span class="cov8" title="1">{
+                return newNode(
+                        n.left.Delete(key),
+                        n.right,
+                        n.key,
+                        n.value,
+                ).rebalance()
+        }</span>
+        <span class="cov8" title="1">return n</span>
+}
+
+func (n *Tree[K, V]) deleteCurrent() *Tree[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov0" title="0">{
+                return n
+        }</span>
+        <span class="cov8" title="1">if n.left.IsEmpty() </span><span class="cov8" title="1">{
+                return n.right
+        }</span>
+
+        <span class="cov8" title="1">if n.right.IsEmpty() </span><span class="cov8" title="1">{
+                return n.left
+        }</span>
+
+        <span class="cov0" title="0">replacement := n.left.rightMost()
+
+        return newNode(
+                n.left.Delete(replacement.key),
+                n.right,
+                replacement.key,
+                replacement.value,
+        ).rebalance()</span>
+}
+
+func (n *Tree[K, V]) rightMost() *Tree[K, V] <span class="cov0" title="0">{
+        if n.IsEmpty() </span><span class="cov0" title="0">{
+                return n
+        }</span>
+        <span class="cov0" title="0">current := n
+
+        for !current.right.IsEmpty() </span><span class="cov0" title="0">{
+                current = current.right
+        }</span>
+        <span class="cov0" title="0">return current</span>
+}
+
+//Size returns the number of nodes in the tree. Will be 0 for empty trees.
+func (n *Tree[K, V]) Size() int <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return n.size</span>
+}
+
+//LeastUpperBound returns the key-value-pair for the smallest node n such that n.Key() &gt;= key. If there is no such
+//node then an empty pair is returned.
+func (n *Tree[K, V]) LeastUpperBound(key K) Pair[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Equal(key) </span><span class="cov8" title="1">{
+                return n
+        }</span>
+        <span class="cov8" title="1">if n.key.Less(key) </span><span class="cov8" title="1">{
+                return n.right.LeastUpperBound(key)
+        }</span>
+
+        <span class="cov8" title="1">ret := n.left.LeastUpperBound(key)
+
+        if ret.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+        <span class="cov8" title="1">return ret</span>
+}
+
+//GreatestLowerBound returns the key-value-par for the largest node n such that n.Key() &lt;= key. If there is no such
+//node than an empty pair is returned.
+func (n *Tree[K, V]) GreatestLowerBound(key K) Pair[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Equal(key) </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov8" title="1">if n.key.Less(key) </span><span class="cov8" title="1">{
+                ret := n.right.GreatestLowerBound(key)
+
+                if ret.IsEmpty() </span><span class="cov8" title="1">{
+                        return n
+                }</span>
+                <span class="cov8" title="1">return ret</span>
+        }
+
+        <span class="cov8" title="1">return n.left.GreatestLowerBound(key)</span>
+}
+
+//Iter returns an in-order iterator for the tree.
+func (n *Tree[K, V]) Iter() Iterator[Pair[K, V]] <span class="cov8" title="1">{
+        ret := treeIterator[K, V]{
+                stack:   nil,
+                current: n,
+        }
+
+        for !ret.current.IsEmpty() </span><span class="cov8" title="1">{
+                ret.stack = append(ret.stack, ret.current)
+                ret.current = ret.current.left
+        }</span>
+        <span class="cov8" title="1">return &amp;ret</span>
+}
+
+//IterGte returns an in-order iterator for the tree for all nodes n such that n.Key() &gt;= glb.
+func (n *Tree[K, V]) IterGte(glb K) Iterator[Pair[K, V]] <span class="cov8" title="1">{
+        ret := treeIterator[K, V]{
+                stack:   nil,
+                current: n,
+        }
+
+        for !ret.current.IsEmpty() </span><span class="cov8" title="1">{
+                if ret.current.Key().Equal(glb) </span><span class="cov0" title="0">{
+                        ret.stack = append(ret.stack, ret.current)
+                        ret.current = nil
+                }</span> else<span class="cov8" title="1"> if ret.current.Key().Less(glb) </span><span class="cov8" title="1">{
+                        ret.current = ret.current.right
+                }</span> else<span class="cov8" title="1"> {
+                        ret.stack = append(ret.stack, ret.current)
+                        ret.current = ret.current.left
+                }</span>
+        }
+
+        <span class="cov8" title="1">return &amp;ret</span>
+}
+
+//Least returns the key-value-pair for the lowest element in the tree. If the tree is empty, the returned pair
+//is also empty.
+func (n *Tree[K, V]) Least() Pair[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov0" title="0">var ret = n
+
+        for !ret.left.IsEmpty() </span><span class="cov0" title="0">{
+                ret = ret.left
+        }</span>
+
+        <span class="cov0" title="0">return ret</span>
+}
+
+//Most returns the key-value-pair for the greatest element in the tree. If the tree is empty, the returned pair
+//is also empty
+func (n *Tree[K, V]) Most() Pair[K, V] <span class="cov8" title="1">{
+        if n.IsEmpty() </span><span class="cov8" title="1">{
+                return n
+        }</span>
+
+        <span class="cov0" title="0">var ret = n
+
+        for !ret.right.IsEmpty() </span><span class="cov0" title="0">{
+                ret = ret.right
+        }</span>
+
+        <span class="cov0" title="0">return ret</span>
+}
+
+func (n *Tree[K, V]) MarshalJSON() ([]byte, error) <span class="cov8" title="1">{
+        m := make(map[K]V)
+        iter := n.Iter()
+        for iter.Next() </span><span class="cov8" title="1">{
+                m[iter.Current().Key()] = iter.Current().Value()
+        }</span>
+        <span class="cov8" title="1">return json.Marshal(m)</span>
+}
+
+func (n *Tree[K, V]) UnmarshalJSON(data []byte) error <span class="cov8" title="1">{
+        var m map[K]V
+        err := json.Unmarshal(data, &amp;m)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">tree := &amp;Tree[K, V]{}
+        for k, v := range m </span><span class="cov8" title="1">{
+                tree = tree.Update(k, v)
+        }</span>
+        <span class="cov8" title="1">*n = *tree
+        return nil</span>
+}
+
+func (i *treeIterator[K, V]) Next() bool <span class="cov8" title="1">{
+        if !i.current.IsEmpty() </span><span class="cov8" title="1">{
+                i.current = i.current.right
+                for !i.current.IsEmpty() </span><span class="cov8" title="1">{
+                        i.stack = append(i.stack, i.current)
+                        i.current = i.current.left
+                }</span>
+        }
+
+        <span class="cov8" title="1">if len(i.stack) != 0 </span><span class="cov8" title="1">{
+                i.current = i.stack[len(i.stack)-1]
+                i.stack = i.stack[:len(i.stack)-1]
+                return true
+        }</span>
+
+        <span class="cov8" title="1">return false</span>
+}
+
+func (i *treeIterator[K, V]) Current() Pair[K, V] <span class="cov8" title="1">{
+        if i.current.IsEmpty() </span><span class="cov0" title="0">{
+                panic("invalid iterator position")</span>
+        }
+        <span class="cov8" title="1">return i.current</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
