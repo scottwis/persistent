@@ -6,44 +6,44 @@ import (
 	"testing"
 )
 
-func TestEmptySetContains(t *testing.T) {
-	var x Set[int]
+func TestEmptySetExContains(t *testing.T) {
+	var x SetEx[Int]
 	require.False(t, x.Contains(42))
 }
 
-func TestNilSetContains(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExContains(t *testing.T) {
+	var x *SetEx[Int]
 	require.False(t, x.Contains(42))
 }
 
-func TestEmptySetRemove(t *testing.T) {
-	var x Set[string]
-	pSet := x.Remove("2")
-	require.Equal(t, 0, pSet.Size())
+func TestEmptySetExRemove(t *testing.T) {
+	var x SetEx[String]
+	pSetEx := x.Remove("2")
+	require.Equal(t, 0, pSetEx.Size())
 }
 
-func TestNilSetRemove(t *testing.T) {
-	var x *Set[string]
-	pSet := x.Remove("2")
-	require.Equal(t, 0, pSet.Size())
+func TestNilSetExRemove(t *testing.T) {
+	var x *SetEx[String]
+	pSetEx := x.Remove("2")
+	require.Equal(t, 0, pSetEx.Size())
 }
 
-func TestEmptySetAdd(t *testing.T) {
-	var x Set[string]
-	pSet := x.Add("2")
-	require.Equal(t, 1, pSet.Size())
-	require.True(t, pSet.Contains("2"))
+func TestEmptySetExAdd(t *testing.T) {
+	var x SetEx[String]
+	pSetEx := x.Add("2")
+	require.Equal(t, 1, pSetEx.Size())
+	require.True(t, pSetEx.Contains("2"))
 }
 
-func TestNilSetAdd(t *testing.T) {
-	var x *Set[string]
-	pSet := x.Add("2")
-	require.Equal(t, 1, pSet.Size())
-	require.True(t, pSet.Contains("2"))
+func TestNilSetExAdd(t *testing.T) {
+	var x *SetEx[String]
+	pSetEx := x.Add("2")
+	require.Equal(t, 1, pSetEx.Size())
+	require.True(t, pSetEx.Contains("2"))
 }
 
-func TestSetAddTwice(t *testing.T) {
-	var x *Set[int]
+func TestSetExAddTwice(t *testing.T) {
+	var x *SetEx[Int]
 	x = x.Add(42)
 	y := x.Add(42)
 	if x != y {
@@ -51,106 +51,106 @@ func TestSetAddTwice(t *testing.T) {
 	}
 }
 
-func TestSetAddRemove(t *testing.T) {
-	var x *Set[int]
+func TestSetExAddRemove(t *testing.T) {
+	var x *SetEx[Int]
 	x = x.Add(4).Add(2).Remove(4)
 	require.Equal(t, 1, x.Size())
 	require.True(t, x.Contains(2))
 	require.False(t, x.Contains(1))
 }
 
-func TestEmptySetLub(t *testing.T) {
-	var x Set[int]
+func TestEmptySetExLub(t *testing.T) {
+	var x SetEx[Int]
 	v, ok := x.LeastUpperBound(42)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 }
 
-func TestNilSetLub(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExLub(t *testing.T) {
+	var x *SetEx[Int]
 	v, ok := x.LeastUpperBound(42)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 }
 
-func TestEmptySetGlb(t *testing.T) {
-	var x Set[int]
+func TestEmptySetExGlb(t *testing.T) {
+	var x SetEx[Int]
 	v, ok := x.GreatestLowerBound(42)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 }
 
-func TestNilSetGlb(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExGlb(t *testing.T) {
+	var x *SetEx[Int]
 	v, ok := x.GreatestLowerBound(42)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 }
 
-func TestSetLub(t *testing.T) {
-	var x *Set[int]
+func TestSetExLub(t *testing.T) {
+	var x *SetEx[Int]
 	for i := 0; i < 20; i += 2 {
-		x = x.Add(i)
+		x = x.Add(Int(i))
 	}
 	v, ok := x.LeastUpperBound(3)
-	require.Equal(t, 4, v)
+	require.Equal(t, Int(4), v)
 	require.True(t, ok)
 	v, ok = x.LeastUpperBound(22)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 	v, ok = x.LeastUpperBound(-1)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.True(t, ok)
 }
 
-func TestSetGlb(t *testing.T) {
-	var x *Set[int]
+func TestSetExGlb(t *testing.T) {
+	var x *SetEx[Int]
 	for i := 0; i < 20; i += 2 {
-		x = x.Add(i)
+		x = x.Add(Int(i))
 	}
 	v, ok := x.GreatestLowerBound(3)
-	require.Equal(t, 2, v)
+	require.Equal(t, Int(2), v)
 	require.True(t, ok)
 	v, ok = x.GreatestLowerBound(22)
-	require.Equal(t, 18, v)
+	require.Equal(t, Int(18), v)
 	require.True(t, ok)
 	v, ok = x.GreatestLowerBound(-1)
-	require.Equal(t, 0, v)
+	require.Equal(t, Int(0), v)
 	require.False(t, ok)
 }
 
-func TestNilSetIsEmpty(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExIsEmpty(t *testing.T) {
+	var x *SetEx[Int]
 	require.True(t, x.IsEmpty())
 }
 
-func TestEmptySetIsEmpty(t *testing.T) {
-	var x Set[int]
+func TestEmptySetExIsEmpty(t *testing.T) {
+	var x SetEx[Int]
 	require.True(t, x.IsEmpty())
 }
 
-func TestSetNotEmpty(t *testing.T) {
-	var x *Set[int]
+func TestSetExNotEmpty(t *testing.T) {
+	var x *SetEx[Int]
 	x = x.Add(42)
 	require.False(t, x.IsEmpty())
 }
 
-func TestSetIter(t *testing.T) {
-	var x *Set[int]
+func TestSetExIter(t *testing.T) {
+	var x *SetEx[Int]
 	for i := 0; i < 20; i += 2 {
-		x = x.Add(i)
+		x = x.Add(Int(i))
 	}
 	iter := x.Iter()
 	i := 0
 	for iter.Next() {
-		require.Equal(t, i, iter.Current())
+		require.Equal(t, Int(i), iter.Current())
 		i += 2
 	}
 	require.Equal(t, 20, i)
 }
 
-func TestNilSetIter(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExIter(t *testing.T) {
+	var x *SetEx[Int]
 	iter := x.Iter()
 	i := 0
 	for iter.Next() {
@@ -159,22 +159,22 @@ func TestNilSetIter(t *testing.T) {
 	require.Equal(t, 0, i)
 }
 
-func TestSetIterGte(t *testing.T) {
-	var x *Set[int]
+func TestSetExIterGte(t *testing.T) {
+	var x *SetEx[Int]
 	for i := 0; i < 20; i += 2 {
-		x = x.Add(i)
+		x = x.Add(Int(i))
 	}
 	iter := x.IterGte(3)
 	i := 4
 	for iter.Next() {
-		require.Equal(t, i, iter.Current())
+		require.Equal(t, Int(i), iter.Current())
 		i += 2
 	}
 	require.Equal(t, 20, i)
 }
 
-func TestNilSetIterGte(t *testing.T) {
-	var x *Set[int]
+func TestNilSetExIterGte(t *testing.T) {
+	var x *SetEx[Int]
 	iter := x.IterGte(3)
 	i := 0
 	for iter.Next() {
@@ -183,11 +183,11 @@ func TestNilSetIterGte(t *testing.T) {
 	require.Equal(t, 0, i)
 }
 
-func TestSetMarshalJson(t *testing.T) {
-	var x *Set[int]
+func TestSetExMarshalJson(t *testing.T) {
+	var x *SetEx[Int]
 	var expected []int
 	for i := 0; i < 20; i += 2 {
-		x = x.Add(i)
+		x = x.Add(Int(i))
 		expected = append(expected, i)
 	}
 	serialized, err := json.Marshal(x)
@@ -198,8 +198,8 @@ func TestSetMarshalJson(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
-func TestStringSetMarshalJson(t *testing.T) {
-	var x *Set[string]
+func TestStringSetExMarshalJson(t *testing.T) {
+	var x *SetEx[String]
 	expected := []string{"Hello", "World"}
 	x = x.Add("Hello").Add("World")
 

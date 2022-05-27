@@ -6,218 +6,230 @@ import (
 	"testing"
 )
 
-func TestNilEmpty(t *testing.T) {
-	var tree *Tree[int, int]
+type Int int
+
+func (x Int) Less(y Int) bool {
+	return x < y
+}
+
+type String string
+
+func (x String) Less(y String) bool {
+	return x < y
+}
+
+func TestExNilEmpty(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.True(t, tree.IsEmpty())
 }
 
-func TestDefaultEmpty(t *testing.T) {
-	var tree Tree[int, int]
+func TestExDefaultEmpty(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.True(t, tree.IsEmpty())
 }
 
-func TestNilHeight(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilHeight(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.Equal(t, 0, tree.Height())
 }
 
-func TestDefaultHeight(t *testing.T) {
-	var tree Tree[int, int]
+func TestExDefaultHeight(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.Equal(t, 0, tree.Height())
 }
 
-func TestNilSize(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilSize(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.Equal(t, 0, tree.Size())
 }
 
-func TestDefaultSize(t *testing.T) {
-	var tree Tree[int, int]
+func TestExDefaultSize(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.Equal(t, 0, tree.Size())
 }
 
-func TestNilFind(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilFind(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	p := tree.Find(2)
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestEmptyFind(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyFind(t *testing.T) {
+	var tree TreeEx[Int, int]
 	p := tree.Find(2)
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestNilDelete(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilDelete(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Delete(2)
 	require.True(t, tree2.IsEmpty())
 }
 
-func TestEmptyDelete(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyDelete(t *testing.T) {
+	var tree TreeEx[Int, int]
 	tree2 := tree.Delete(2)
 	require.True(t, tree2.IsEmpty())
 }
 
-func TestNilGLB(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilGLB(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	p := tree.GreatestLowerBound(2)
 	require.True(t, p.IsEmpty())
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 }
 
-func TestEmptyGLB(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyGLB(t *testing.T) {
+	var tree TreeEx[Int, int]
 	p := tree.GreatestLowerBound(2)
 	require.True(t, p.IsEmpty())
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 }
 
-func TestNilLUB(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilLUB(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	p := tree.LeastUpperBound(2)
 	require.True(t, p.IsEmpty())
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 }
 
-func TestEmptyLUB(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyLUB(t *testing.T) {
+	var tree TreeEx[Int, int]
 	p := tree.LeastUpperBound(2)
 	require.True(t, p.IsEmpty())
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 }
 
-func TestNilIter(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilIter(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	i := tree.Iter()
 	require.False(t, i.Next())
 }
 
-func TestEmptyIter(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyIter(t *testing.T) {
+	var tree TreeEx[Int, int]
 	i := tree.Iter()
 	require.False(t, i.Next())
 }
 
-func TestNilIterGTE(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilIterGTE(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	i := tree.IterGte(5)
 	require.False(t, i.Next())
 }
 
-func TestEmptyIterGTE(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyIterGTE(t *testing.T) {
+	var tree TreeEx[Int, int]
 	i := tree.IterGte(5)
 	require.False(t, i.Next())
 }
 
-func TestNilLeft(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilLeft(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.True(t, tree.Left().IsEmpty())
 }
 
-func TestEmptyLeft(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyLeft(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.True(t, tree.Left().IsEmpty())
 }
 
-func TestNilRight(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilRight(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.True(t, tree.Right().IsEmpty())
 }
 
-func TestEmptyRight(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyRight(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.True(t, tree.Right().IsEmpty())
 }
 
-func TestNilKey(t *testing.T) {
-	var tree *Tree[int, int]
-	require.Equal(t, 0, tree.Key())
+func TestExNilKey(t *testing.T) {
+	var tree *TreeEx[Int, int]
+	require.Equal(t, Int(0), tree.Key())
 }
 
-func TestEmptyKey(t *testing.T) {
-	var tree Tree[int, int]
-	require.Equal(t, 0, tree.Key())
+func TestExEmptyKey(t *testing.T) {
+	var tree TreeEx[Int, int]
+	require.Equal(t, Int(0), tree.Key())
 }
 
-func TestNilValue(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilValue(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	require.Equal(t, 0, tree.Value())
 }
 
-func TestEmptyValue(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyValue(t *testing.T) {
+	var tree TreeEx[Int, int]
 	require.Equal(t, 0, tree.Value())
 }
 
-func TestNilLeast(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilLeast(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	p := tree.Least()
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestEmptyLeast(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyLeast(t *testing.T) {
+	var tree TreeEx[Int, int]
 	p := tree.Least()
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestNilMost(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilMost(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	p := tree.Most()
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestEmptyMost(t *testing.T) {
-	var tree Tree[int, int]
+func TestExEmptyMost(t *testing.T) {
+	var tree TreeEx[Int, int]
 	p := tree.Most()
 	if p == nil {
 		require.Fail(t, "wtf?")
 	}
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 0, p.Value())
 	require.True(t, p.IsEmpty())
 }
 
-func TestNilUpdate(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExNilUpdate(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Update(2, 3)
 	require.NotEqual(t, tree, tree2)
 	require.False(t, tree2.IsEmpty())
 	require.Equal(t, 1, tree2.Size())
 	require.Equal(t, 1, tree2.Height())
-	require.Equal(t, 2, tree2.Key())
+	require.Equal(t, Int(2), tree2.Key())
 	require.Equal(t, 3, tree2.Value())
 	p := tree2.Find(4)
 	if p == nil {
@@ -226,25 +238,25 @@ func TestNilUpdate(t *testing.T) {
 	require.True(t, p.IsEmpty())
 	p = tree2.Find(2)
 	require.False(t, p.IsEmpty())
-	require.Equal(t, 2, p.Key())
+	require.Equal(t, Int(2), p.Key())
 	require.Equal(t, 3, p.Value())
 	p = tree2.Find(1)
 	require.True(t, p.IsEmpty())
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, 2, i.Current().Key())
+	require.Equal(t, Int(2), i.Current().Key())
 	require.Equal(t, 3, i.Current().Value())
 	require.False(t, i.Next())
 }
 
-func TestEmptyUpdate(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExEmptyUpdate(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Update(2, 3)
 	require.NotEqual(t, tree, tree2)
 	require.False(t, tree2.IsEmpty())
 	require.Equal(t, 1, tree2.Size())
 	require.Equal(t, 1, tree2.Height())
-	require.Equal(t, 2, tree2.Key())
+	require.Equal(t, Int(2), tree2.Key())
 	require.Equal(t, 3, tree2.Value())
 	p := tree2.Find(4)
 	if p == nil {
@@ -253,26 +265,26 @@ func TestEmptyUpdate(t *testing.T) {
 	require.True(t, p.IsEmpty())
 	p = tree2.Find(2)
 	require.False(t, p.IsEmpty())
-	require.Equal(t, 2, p.Key())
+	require.Equal(t, Int(2), p.Key())
 	require.Equal(t, 3, p.Value())
 	p = tree2.Find(1)
 	require.True(t, p.IsEmpty())
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, 2, i.Current().Key())
+	require.Equal(t, Int(2), i.Current().Key())
 	require.Equal(t, 3, i.Current().Value())
 	require.False(t, i.Next())
 }
 
-func TestUpdateReplace(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExUpdateReplace(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Update(2, 3).Update(0, 4).Update(4, 5)
 	tree3 := tree2.Update(0, 10)
 	require.NotEqual(t, tree, tree2)
 	require.NotEqual(t, tree2, tree3)
 	p := tree3.Find(0)
 	require.False(t, p.IsEmpty())
-	require.Equal(t, 0, p.Key())
+	require.Equal(t, Int(0), p.Key())
 	require.Equal(t, 10, p.Value())
 	require.False(t, tree3.Left().IsEmpty())
 	require.False(t, tree3.Right().IsEmpty())
@@ -282,20 +294,20 @@ func TestUpdateReplace(t *testing.T) {
 	require.True(t, tree3.Right().Right().IsEmpty())
 }
 
-func TestRotateLeft(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExRotateLeft(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Update(1, 1).Update(2, 2).Update(3, 3)
 	require.False(t, tree2.IsEmpty())
-	require.Equal(t, 2, tree2.Key())
-	require.Equal(t, 1, tree2.Left().Key())
-	require.Equal(t, 3, tree2.Right().Key())
+	require.Equal(t, Int(2), tree2.Key())
+	require.Equal(t, Int(1), tree2.Left().Key())
+	require.Equal(t, Int(3), tree2.Right().Key())
 }
 
-func TestRotateRightLeft(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExRotateRightLeft(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	items := []int{10, 9, 15, 13, 16, 14}
 	for _, i := range items {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	require.Equal(t, 13, tree.Value())
 	require.Equal(t, 10, tree.Left().Value())
@@ -306,19 +318,19 @@ func TestRotateRightLeft(t *testing.T) {
 	require.Equal(t, 16, tree.Right().Right().Value())
 }
 
-func TestRotateRight(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExRotateRight(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	tree2 := tree.Update(2, 2).Update(1, 1).Update(0, 0)
 	require.Equal(t, 1, tree2.Value())
 	require.Equal(t, 0, tree2.Left().Value())
 	require.Equal(t, 2, tree2.Right().Value())
 }
 
-func TestRotateLeftRight(t *testing.T) {
-	var tree *Tree[int, int]
+func TestExRotateLeftRight(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	items := []int{20, 21, 15, 17, 14, 19}
 	for _, i := range items {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	require.Equal(t, 17, tree.Value())
 	require.Equal(t, 15, tree.Left().Value())
@@ -329,10 +341,10 @@ func TestRotateLeftRight(t *testing.T) {
 	require.Equal(t, 21, tree.Right().Right().Value())
 }
 
-func TestLeastUpperBound(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExLeastUpperBound(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	p := tree.LeastUpperBound(4)
 	require.Equal(t, 4, p.Value())
@@ -344,10 +356,10 @@ func TestLeastUpperBound(t *testing.T) {
 	require.Equal(t, 0, p.Value())
 }
 
-func TestGreatestLowerBound(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExGreatestLowerBound(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	p := tree.GreatestLowerBound(4)
 	require.Equal(t, 4, p.Value())
@@ -359,10 +371,10 @@ func TestGreatestLowerBound(t *testing.T) {
 	require.True(t, p.IsEmpty())
 }
 
-func TestIter(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExIter(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	iter := tree.Iter()
 	j := 0
@@ -373,10 +385,10 @@ func TestIter(t *testing.T) {
 	require.Equal(t, 20, j)
 }
 
-func TestIterGte(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExIterGte(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	iter := tree.IterGte(7)
 	j := 8
@@ -387,10 +399,10 @@ func TestIterGte(t *testing.T) {
 	require.Equal(t, 20, j)
 }
 
-func TestDelete(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExDelete(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 	}
 	t2 := tree.Delete(7)
 	if tree != t2 {
@@ -400,17 +412,17 @@ func TestDelete(t *testing.T) {
 	require.False(t, t3.IsEmpty())
 	require.Equal(t, 7, t3.Size())
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Delete(i)
+		tree = tree.Delete(Int(i))
 	}
 
 	require.True(t, tree.IsEmpty())
 }
 
-func TestMarshalJson(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+func TestExMarshalJson(t *testing.T) {
+	var tree *TreeEx[Int, int]
 	expected := make(map[int]int)
 	for i := 0; i < 20; i += 2 {
-		tree = tree.Update(i, i)
+		tree = tree.Update(Int(i), i)
 		expected[i] = i
 	}
 	serialized, err := json.Marshal(tree)
@@ -421,27 +433,27 @@ func TestMarshalJson(t *testing.T) {
 	require.Equal(t, expected, actual)
 }
 
-func TestUnmarshalJson(t *testing.T) {
+func TestExUnmarshalJson(t *testing.T) {
 	m := make(map[int]int)
 	for i := 0; i < 20; i += 2 {
 		m[i] = i
 	}
 	serialized, err := json.Marshal(m)
 	require.NoError(t, err)
-	var tree *Tree[int, int]
+	var tree *TreeEx[Int, int]
 	err = json.Unmarshal(serialized, &tree)
 	require.NoError(t, err)
 	require.Equal(t, 10, tree.Size())
 	iter := tree.Iter()
 	i := 0
 	for iter.Next() {
-		require.Equal(t, i, iter.Current().Key())
+		require.Equal(t, Int(i), iter.Current().Key())
 		i += 2
 	}
 	require.Equal(t, 20, i)
 }
 
-func TestUnMarshalJsonStringKey(t *testing.T) {
+func TestExUnMarshalJsonStringKey(t *testing.T) {
 	expected := map[string]int{
 		"Hello": 2,
 		"World": 4,
@@ -449,7 +461,7 @@ func TestUnMarshalJsonStringKey(t *testing.T) {
 	serialized, err := json.Marshal(expected)
 	require.NoError(t, err)
 
-	var x *Tree[string, int]
+	var x *TreeEx[String, int]
 	err = json.Unmarshal(serialized, &x)
 	require.NoError(t, err)
 	require.Equal(t, 2, x.Find("Hello").Value())
