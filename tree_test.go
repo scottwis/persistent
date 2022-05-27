@@ -330,7 +330,7 @@ func TestRotateLeftRight(t *testing.T) {
 }
 
 func TestLeastUpperBound(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)
 	}
@@ -345,7 +345,7 @@ func TestLeastUpperBound(t *testing.T) {
 }
 
 func TestGreatestLowerBound(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)
 	}
@@ -360,7 +360,7 @@ func TestGreatestLowerBound(t *testing.T) {
 }
 
 func TestIter(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)
 	}
@@ -374,7 +374,7 @@ func TestIter(t *testing.T) {
 }
 
 func TestIterGte(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)
 	}
@@ -388,7 +388,7 @@ func TestIterGte(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)
 	}
@@ -407,7 +407,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestMarshalJson(t *testing.T) {
-	tree := EmptyPrimitiveTree[int, int]()
+	tree := EmptyTree[int, int]()
 	expected := make(map[int]int)
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(i, i)

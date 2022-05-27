@@ -68,7 +68,7 @@ func (n *Tree[K, V]) Find(key K) Pair[K, V] {
 	return n
 }
 
-func newPrimitiveNode[K constraints.Ordered, V any](left *Tree[K, V], right *Tree[K, V], key K, value V) *Tree[K, V] {
+func newNode[K constraints.Ordered, V any](left *Tree[K, V], right *Tree[K, V], key K, value V) *Tree[K, V] {
 	return &Tree[K, V]{
 		left:   left,
 		right:  right,
@@ -82,18 +82,18 @@ func newPrimitiveNode[K constraints.Ordered, V any](left *Tree[K, V], right *Tre
 // Update returns the root of a new tree with the value for 'key' set to 'value'.
 func (n *Tree[K, V]) Update(key K, value V) *Tree[K, V] {
 	if n.IsEmpty() {
-		return newPrimitiveNode(nil, nil, key, value)
+		return newNode(nil, nil, key, value)
 	}
 
 	if n.key < key {
-		return newPrimitiveNode(n.left, n.right.Update(key, value), n.key, n.value).rebalance()
+		return newNode(n.left, n.right.Update(key, value), n.key, n.value).rebalance()
 	}
 
 	if key < n.key {
-		return newPrimitiveNode(n.left.Update(key, value), n.right, n.key, n.value).rebalance()
+		return newNode(n.left.Update(key, value), n.right, n.key, n.value).rebalance()
 	}
 
-	return newPrimitiveNode(n.left, n.right, key, value)
+	return newNode(n.left, n.right, key, value)
 }
 
 // Height returns the height of the tree rooted at node n. Will return 0 if n is empty.
@@ -136,8 +136,8 @@ func (n *Tree[K, V]) rebalance() *Tree[K, V] {
 }
 
 func (n *Tree[K, V]) rotateLeft() *Tree[K, V] {
-	return newPrimitiveNode(
-		newPrimitiveNode(n.left, n.right.left, n.key, n.value),
+	return newNode(
+		newNode(n.left, n.right.left, n.key, n.value),
 		n.right.right,
 		n.right.key,
 		n.right.value,
@@ -145,16 +145,16 @@ func (n *Tree[K, V]) rotateLeft() *Tree[K, V] {
 }
 
 func (n *Tree[K, V]) rotateRight() *Tree[K, V] {
-	return newPrimitiveNode(
+	return newNode(
 		n.left.left,
-		newPrimitiveNode(n.left.right, n.right, n.key, n.value),
+		newNode(n.left.right, n.right, n.key, n.value),
 		n.left.key,
 		n.left.value,
 	)
 }
 
 func (n *Tree[K, V]) rotateRightLeft() *Tree[K, V] {
-	return newPrimitiveNode(
+	return newNode(
 		n.left,
 		n.right.rotateRight(),
 		n.key,
@@ -163,7 +163,7 @@ func (n *Tree[K, V]) rotateRightLeft() *Tree[K, V] {
 }
 
 func (n *Tree[K, V]) rotateLeftRight() *Tree[K, V] {
-	return newPrimitiveNode(
+	return newNode(
 		n.left.rotateLeft(),
 		n.right,
 		n.key,
@@ -198,7 +198,7 @@ func (n *Tree[K, V]) Delete(key K) *Tree[K, V] {
 	if n.key < key {
 		r := n.right.Delete(key)
 		if r != n.right {
-			return newPrimitiveNode(
+			return newNode(
 				n.left,
 				n.right.Delete(key),
 				n.key,
@@ -211,7 +211,7 @@ func (n *Tree[K, V]) Delete(key K) *Tree[K, V] {
 	if key < n.key {
 		l := n.left.Delete(key)
 		if l != n.left {
-			return newPrimitiveNode(
+			return newNode(
 				n.left.Delete(key),
 				n.right,
 				n.key,
@@ -238,7 +238,7 @@ func (n *Tree[K, V]) deleteCurrent() *Tree[K, V] {
 
 	replacement := n.left.rightMost()
 
-	return newPrimitiveNode(
+	return newNode(
 		n.left.Delete(replacement.key),
 		n.right,
 		replacement.key,
@@ -427,6 +427,6 @@ func (i *TreeIterator[K, V]) Current() Pair[K, V] {
 	return i.current
 }
 
-func EmptyPrimitiveTree[K constraints.Ordered, V any]() *Tree[K, V] {
+func EmptyTree[K constraints.Ordered, V any]() *Tree[K, V] {
 	return nil
 }

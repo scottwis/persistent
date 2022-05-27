@@ -1,6 +1,8 @@
 package persistent
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // TreeEx implements a persistent AVL tree for keys implementing the Ordered[K] interface. For built-in
 // ordered keys (types supporting <) see Tree[K,V],
@@ -65,7 +67,7 @@ func (n *TreeEx[K, V]) Find(key K) Pair[K, V] {
 	return n
 }
 
-func newOrderedNode[K Ordered[K], V any](left *TreeEx[K, V], right *TreeEx[K, V], key K, value V) *TreeEx[K, V] {
+func newExNode[K Ordered[K], V any](left *TreeEx[K, V], right *TreeEx[K, V], key K, value V) *TreeEx[K, V] {
 	return &TreeEx[K, V]{
 		left:   left,
 		right:  right,
@@ -93,18 +95,18 @@ func abs(i int) int {
 // Update returns the root of a new tree with the value for 'key' set to 'value'.
 func (n *TreeEx[K, V]) Update(key K, value V) *TreeEx[K, V] {
 	if n.IsEmpty() {
-		return newOrderedNode(nil, nil, key, value)
+		return newExNode(nil, nil, key, value)
 	}
 
 	if n.key.Less(key) {
-		return newOrderedNode(n.left, n.right.Update(key, value), n.key, n.value).rebalance()
+		return newExNode(n.left, n.right.Update(key, value), n.key, n.value).rebalance()
 	}
 
 	if key.Less(n.key) {
-		return newOrderedNode(n.left.Update(key, value), n.right, n.key, n.value).rebalance()
+		return newExNode(n.left.Update(key, value), n.right, n.key, n.value).rebalance()
 	}
 
-	return newOrderedNode(n.left, n.right, key, value)
+	return newExNode(n.left, n.right, key, value)
 }
 
 // Height returns the height of the tree rooted at node n. Will return 0 if n is empty.
@@ -147,8 +149,8 @@ func (n *TreeEx[K, V]) rebalance() *TreeEx[K, V] {
 }
 
 func (n *TreeEx[K, V]) rotateLeft() *TreeEx[K, V] {
-	return newOrderedNode(
-		newOrderedNode(n.left, n.right.left, n.key, n.value),
+	return newExNode(
+		newExNode(n.left, n.right.left, n.key, n.value),
 		n.right.right,
 		n.right.key,
 		n.right.value,
@@ -156,16 +158,16 @@ func (n *TreeEx[K, V]) rotateLeft() *TreeEx[K, V] {
 }
 
 func (n *TreeEx[K, V]) rotateRight() *TreeEx[K, V] {
-	return newOrderedNode(
+	return newExNode(
 		n.left.left,
-		newOrderedNode(n.left.right, n.right, n.key, n.value),
+		newExNode(n.left.right, n.right, n.key, n.value),
 		n.left.key,
 		n.left.value,
 	)
 }
 
 func (n *TreeEx[K, V]) rotateRightLeft() *TreeEx[K, V] {
-	return newOrderedNode(
+	return newExNode(
 		n.left,
 		n.right.rotateRight(),
 		n.key,
@@ -174,7 +176,7 @@ func (n *TreeEx[K, V]) rotateRightLeft() *TreeEx[K, V] {
 }
 
 func (n *TreeEx[K, V]) rotateLeftRight() *TreeEx[K, V] {
-	return newOrderedNode(
+	return newExNode(
 		n.left.rotateLeft(),
 		n.right,
 		n.key,
@@ -209,7 +211,7 @@ func (n *TreeEx[K, V]) Delete(key K) *TreeEx[K, V] {
 	if n.key.Less(key) {
 		r := n.right.Delete(key)
 		if r != n.right {
-			return newOrderedNode(
+			return newExNode(
 				n.left,
 				n.right.Delete(key),
 				n.key,
@@ -222,7 +224,7 @@ func (n *TreeEx[K, V]) Delete(key K) *TreeEx[K, V] {
 	if key.Less(n.key) {
 		l := n.left.Delete(key)
 		if l != n.left {
-			return newOrderedNode(
+			return newExNode(
 				n.left.Delete(key),
 				n.right,
 				n.key,
@@ -249,7 +251,7 @@ func (n *TreeEx[K, V]) deleteCurrent() *TreeEx[K, V] {
 
 	replacement := n.left.rightMost()
 
-	return newOrderedNode(
+	return newExNode(
 		n.left.Delete(replacement.key),
 		n.right,
 		replacement.key,
@@ -436,4 +438,8 @@ func (i *TreeExIterator[K, V]) Current() Pair[K, V] {
 		panic("invalid iterator position")
 	}
 	return i.current
+}
+
+func EmptyTreeEx[K Ordered[K], V any]() *TreeEx[K, V] {
+	return nil
 }
