@@ -5,14 +5,25 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Tree implements a persistent AVL tree for keys types that support the < operator. For custom KeyTypes see
+// Tree implements a persistent AVL tree for keys types that support the < operator. For custom key types see
 // TreeEx[K,V].
+//
+// Note: Both an empty Tree struct and a nil *Tree are valid empty trees.
 //
 // Persistent AVL trees are immutable. Each mutating operation will return the root of a new tree with the requested
 // update applied.The implementation uses structural sharing to make immutability efficient. For any given update
 // at most O(log(N)) nodes will be replaced in the new tree. The implementation is concurrency safe and non-blocking.
 // A *Tree[K,V] instance may be accessed from multiple go-routines without synchronization. See the docs for Iterator[T]
 // for notes on the concurrent use of iterators.
+//
+// Example:
+// var root *Tree[string, int]
+// root = root.Update("Hello", 1).Update("World, 2).Update("Apple", 3).Update("Stuff", 4)
+// root = root.Remove("Apple")
+// iter := root.Iter()
+// for iter.MoveNext() {
+//     fmt.Printf("%v == %v\n", iter.Current().Key(), iter.Current.Value())
+// }
 type Tree[K constraints.Ordered, V any] struct {
 	left   *Tree[K, V]
 	right  *Tree[K, V]
@@ -22,7 +33,7 @@ type Tree[K constraints.Ordered, V any] struct {
 	height int
 }
 
-// TreeIterator defines an iterator over an Tree
+// TreeIterator defines an iterator over a Tree
 type TreeIterator[K constraints.Ordered, V any] struct {
 	stack   []*Tree[K, V]
 	current *Tree[K, V]

@@ -5,13 +5,14 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Set defines a set interface implemented using a persistent AVL tree.
+// Set defines a set interface implemented using a persistent AVL tree. It works for all types that support the <
+// operator. For custom types see the SetEx method.
 //
 // Persistent AVL trees are immutable. Each mutating operation will return the root of a new tree with the requested
 // update applied. The implementation uses structural sharing to make immutability efficient. For any given
 // update, at most O(log(n)) nodes will be replaced in the new tree. The implementation is also concurrency-safe
 // and non-blocking. A *Set[T] instance may be accessed from multiple go-routines without synchronization. See the
-// docs on Iterator[T] for notes on current use of iterators.
+// docs on Iterator[T] for notes on concurrent use of iterators.
 type Set[T constraints.Ordered] struct {
 	tree *Tree[T, bool]
 }
