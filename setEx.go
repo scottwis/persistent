@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 )
 
-// SetEx defines a set interface implemented using a persistent AVL tree.
+// SetEx defines a set interface implemented using a persistent AVL tree. It works for custom types that implement
+// the Ordered[T] interface. See Set[T] for types that support the < interface.
 //
 // Persistent AVL trees are immutable. Each mutating operation will return the root of a new tree with the requested
 // update applied. The implementation uses structural sharing to make immutability efficient. For any given
 // update, at most O(log(n)) nodes will be replaced in the new tree. The implementation is also concurrency-safe
 // and non-blocking. A *Set[T] instance may be accessed from multiple go-routines without synchronization. See the
-// docs for Iterator[T] for notes on current use of iterators.
+// docs for Iterator[T] for notes on concurrent use of iterators.
 type SetEx[T Ordered[T]] struct {
 	tree *TreeEx[T, bool]
 }
