@@ -3,6 +3,7 @@ package persistent
 import (
 	"encoding/json"
 	"github.com/stretchr/testify/require"
+	"strconv"
 	"testing"
 )
 
@@ -10,6 +11,14 @@ type Int int
 
 func (x Int) Less(y Int) bool {
 	return x < y
+}
+
+func (x *Int) UnmarshalText(text []byte) error {
+	value, err := strconv.Atoi(string(text))
+	if err == nil {
+		*x = Int(value)
+	}
+	return err
 }
 
 type String string
