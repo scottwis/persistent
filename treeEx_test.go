@@ -59,24 +59,18 @@ func TestExDefaultSize(t *testing.T) {
 
 func TestExNilFind(t *testing.T) {
 	var tree *TreeEx[Int, int]
-	p := tree.Find(2)
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	c := tree.Contains(2)
+	v := tree.Find(2)
+	require.Falsef(t, c, "wtf?")
+	require.Zero(t, v)
 }
 
 func TestExEmptyFind(t *testing.T) {
 	var tree TreeEx[Int, int]
-	p := tree.Find(2)
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	c := tree.Contains(2)
+	v := tree.Find(2)
+	require.Falsef(t, c, "wtf?")
+	require.Zero(t, v)
 }
 
 func TestExNilDelete(t *testing.T) {
@@ -93,34 +87,30 @@ func TestExEmptyDelete(t *testing.T) {
 
 func TestExNilGLB(t *testing.T) {
 	var tree *TreeEx[Int, int]
-	p := tree.GreatestLowerBound(2)
-	require.True(t, p.IsEmpty())
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
+	kv, found := tree.GreatestLowerBound(2)
+	require.Falsef(t, found, "wtf?")
+	require.Nil(t, kv)
 }
 
 func TestExEmptyGLB(t *testing.T) {
 	var tree TreeEx[Int, int]
-	p := tree.GreatestLowerBound(2)
-	require.True(t, p.IsEmpty())
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
+	kv, found := tree.GreatestLowerBound(2)
+	require.Falsef(t, found, "wtf?")
+	require.Equal(t, &TreeEx[Int, int]{}, kv)
 }
 
 func TestExNilLUB(t *testing.T) {
 	var tree *TreeEx[Int, int]
-	p := tree.LeastUpperBound(2)
-	require.True(t, p.IsEmpty())
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
+	kv, found := tree.LeastUpperBound(2)
+	require.Falsef(t, found, "wtf?")
+	require.Nil(t, kv)
 }
 
 func TestExEmptyLUB(t *testing.T) {
 	var tree TreeEx[Int, int]
-	p := tree.LeastUpperBound(2)
-	require.True(t, p.IsEmpty())
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
+	kv, found := tree.LeastUpperBound(2)
+	require.Falsef(t, found, "wtf?")
+	require.Equal(t, &TreeEx[Int, int]{}, kv)
 }
 
 func TestExNilIter(t *testing.T) {
@@ -189,46 +179,32 @@ func TestExEmptyValue(t *testing.T) {
 
 func TestExNilLeast(t *testing.T) {
 	var tree *TreeEx[Int, int]
-	p := tree.Least()
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	kv, found := tree.Least()
+	require.False(t, found)
+	require.Nil(t, kv)
 }
 
 func TestExEmptyLeast(t *testing.T) {
 	var tree TreeEx[Int, int]
-	p := tree.Least()
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	kv, found := tree.Least()
+	require.False(t, found)
+	require.Nil(t, kv)
+
 }
 
 func TestExNilMost(t *testing.T) {
 	var tree *TreeEx[Int, int]
-	p := tree.Most()
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	kv, found := tree.Most()
+	require.Falsef(t, found, "wtf?")
+	require.Nil(t, kv)
+
 }
 
 func TestExEmptyMost(t *testing.T) {
 	var tree TreeEx[Int, int]
-	p := tree.Most()
-	if p == nil {
-		require.Fail(t, "wtf?")
-	}
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 0, p.Value())
-	require.True(t, p.IsEmpty())
+	kv, found := tree.Most()
+	require.Falsef(t, found, "wtf?")
+	require.Nil(t, kv)
 }
 
 func TestExNilUpdate(t *testing.T) {
@@ -240,17 +216,19 @@ func TestExNilUpdate(t *testing.T) {
 	require.Equal(t, 1, tree2.Height())
 	require.Equal(t, Int(2), tree2.Key())
 	require.Equal(t, 3, tree2.Value())
-	p := tree2.Find(4)
-	if p == nil {
-		require.Fail(t, "wtf")
-	}
-	require.True(t, p.IsEmpty())
-	p = tree2.Find(2)
-	require.False(t, p.IsEmpty())
-	require.Equal(t, Int(2), p.Key())
-	require.Equal(t, 3, p.Value())
-	p = tree2.Find(1)
-	require.True(t, p.IsEmpty())
+	c := tree2.Contains(4)
+	v := tree2.Find(4)
+	require.Falsef(t, c, "wtf")
+	require.Zero(t, v)
+
+	c = tree2.Contains(2)
+	v = tree2.Find(2)
+	require.True(t, c)
+	require.Equal(t, 3, v)
+	c = tree2.Contains(1)
+	v = tree2.Find(1)
+	require.False(t, c)
+	require.Zero(t, v)
 	i := tree2.Iter()
 	require.True(t, i.Next())
 	require.Equal(t, Int(2), i.Current().Key())
@@ -267,17 +245,22 @@ func TestExEmptyUpdate(t *testing.T) {
 	require.Equal(t, 1, tree2.Height())
 	require.Equal(t, Int(2), tree2.Key())
 	require.Equal(t, 3, tree2.Value())
-	p := tree2.Find(4)
-	if p == nil {
-		require.Fail(t, "wtf")
-	}
-	require.True(t, p.IsEmpty())
-	p = tree2.Find(2)
-	require.False(t, p.IsEmpty())
-	require.Equal(t, Int(2), p.Key())
-	require.Equal(t, 3, p.Value())
-	p = tree2.Find(1)
-	require.True(t, p.IsEmpty())
+	c := tree2.Contains(4)
+	v := tree2.Find(4)
+	require.False(t, c)
+	require.Zero(t, v)
+	v, c = tree2.FindOpt(4)
+	require.False(t, c)
+	require.Zero(t, v)
+	c = tree2.Contains(2)
+	v = tree2.Find(2)
+	require.True(t, c)
+	require.Equal(t, 3, v)
+	v, c = tree2.FindOpt(2)
+	require.True(t, c)
+	require.Equal(t, 3, v)
+	v = tree2.Find(1)
+	require.Zero(t, v)
 	i := tree2.Iter()
 	require.True(t, i.Next())
 	require.Equal(t, Int(2), i.Current().Key())
@@ -291,10 +274,11 @@ func TestExUpdateReplace(t *testing.T) {
 	tree3 := tree2.Update(0, 10)
 	require.NotEqual(t, tree, tree2)
 	require.NotEqual(t, tree2, tree3)
-	p := tree3.Find(0)
-	require.False(t, p.IsEmpty())
-	require.Equal(t, Int(0), p.Key())
-	require.Equal(t, 10, p.Value())
+	c := tree3.Contains(0)
+	v := tree3.Find(0)
+	require.True(t, c)
+	require.Equal(t, 10, v)
+
 	require.False(t, tree3.Left().IsEmpty())
 	require.False(t, tree3.Right().IsEmpty())
 	require.True(t, tree3.Left().Left().IsEmpty())
@@ -355,13 +339,13 @@ func TestExLeastUpperBound(t *testing.T) {
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(Int(i), i)
 	}
-	p := tree.LeastUpperBound(4)
+	p, _ := tree.LeastUpperBound(4)
 	require.Equal(t, 4, p.Value())
-	p = tree.LeastUpperBound(5)
+	p, _ = tree.LeastUpperBound(5)
 	require.Equal(t, 6, p.Value())
-	p = tree.LeastUpperBound(22)
-	require.True(t, p.IsEmpty())
-	p = tree.LeastUpperBound(-1)
+	_, found := tree.LeastUpperBound(22)
+	require.False(t, found)
+	p, _ = tree.LeastUpperBound(-1)
 	require.Equal(t, 0, p.Value())
 }
 
@@ -370,14 +354,14 @@ func TestExGreatestLowerBound(t *testing.T) {
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(Int(i), i)
 	}
-	p := tree.GreatestLowerBound(4)
+	p, _ := tree.GreatestLowerBound(4)
 	require.Equal(t, 4, p.Value())
-	p = tree.GreatestLowerBound(5)
+	p, _ = tree.GreatestLowerBound(5)
 	require.Equal(t, 4, p.Value())
-	p = tree.GreatestLowerBound(22)
+	p, _ = tree.GreatestLowerBound(22)
 	require.Equal(t, 18, p.Value())
-	p = tree.GreatestLowerBound(-1)
-	require.True(t, p.IsEmpty())
+	_, found := tree.GreatestLowerBound(-1)
+	require.False(t, found)
 }
 
 func TestExIter(t *testing.T) {
@@ -473,6 +457,7 @@ func TestExUnMarshalJsonStringKey(t *testing.T) {
 	var x *TreeEx[String, int]
 	err = json.Unmarshal(serialized, &x)
 	require.NoError(t, err)
-	require.Equal(t, 2, x.Find("Hello").Value())
-	require.Equal(t, 4, x.Find("World").Value())
+
+	require.Equal(t, 2, x.Find("Hello"))
+	require.Equal(t, 4, x.Find("World"))
 }
