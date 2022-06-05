@@ -7,9 +7,6 @@ type Pair[K any, V any] interface {
 
 	// Value Returns the value associated with the pair. Will return the zero value for V if IsEmpty is true.
 	Value() V
-
-	// IsEmpty returns true iif the pair is empty.
-	IsEmpty() bool
 }
 
 // Iterator defines an interface for an iterator over a persistent data structure.

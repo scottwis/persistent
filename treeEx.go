@@ -50,21 +50,35 @@ func (n *TreeEx[K, V]) IsEmpty() bool {
 	return n == nil || n.size == 0
 }
 
-// Find returns the pair associated with key in the tree. Will return an empty pair if no such item exists.
-func (n *TreeEx[K, V]) Find(key K) Pair[K, V] {
+// Contains returns true if the tree contains the key.
+func (n *TreeEx[K, V]) Contains(key K) bool {
+	_, found := n.FindOpt(key)
+	return found
+}
+
+// Find returns the pair associated with key in the tree. Will return a zero value if no such item exists.
+func (n *TreeEx[K, V]) Find(key K) V {
+	value, _ := n.FindOpt(key)
+	return value
+}
+
+// FindOpt returns the pair associated with key in the tree. Return true if found; otherwise false.
+// Zero value is returned when found is false.
+func (n *TreeEx[K, V]) FindOpt(key K) (V, bool) {
 	if n.IsEmpty() {
-		return n
+		var ret V
+		return ret, false
 	}
 
 	if n.key.Less(key) {
-		return n.right.Find(key)
+		return n.right.FindOpt(key)
 	}
 
 	if key.Less(n.key) {
-		return n.left.Find(key)
+		return n.left.FindOpt(key)
 	}
 
-	return n
+	return n.value, true
 }
 
 func newExNode[K Ordered[K], V any](left *TreeEx[K, V], right *TreeEx[K, V], key K, value V) *TreeEx[K, V] {
@@ -279,10 +293,10 @@ func (n *TreeEx[K, V]) Size() int {
 }
 
 //LeastUpperBound returns the key-value-pair for the smallest node n such that n.Key() >= key. If there is no such
-//node then an empty pair is returned.
-func (n *TreeEx[K, V]) LeastUpperBound(key K) Pair[K, V] {
+//node then false is returned.
+func (n *TreeEx[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return n, false
 	}
 
 	if n.key.Less(key) {
@@ -290,38 +304,37 @@ func (n *TreeEx[K, V]) LeastUpperBound(key K) Pair[K, V] {
 	}
 
 	if key.Less(n.key) {
-		ret := n.left.LeastUpperBound(key)
+		ret, found := n.left.LeastUpperBound(key)
 
-		if ret.IsEmpty() {
-			return n
+		if !found {
+			return n, true
 		}
-		return ret
+		return ret, true
 	}
 
-	return n
+	return n, true
 }
 
 //GreatestLowerBound returns the key-value-par for the largest node n such that n.Key() <= key. If there is no such
-//node than an empty pair is returned.
-func (n *TreeEx[K, V]) GreatestLowerBound(key K) Pair[K, V] {
+//node then false is returned.
+func (n *TreeEx[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return n, false
 	}
 
 	if n.key.Less(key) {
-		ret := n.right.GreatestLowerBound(key)
-
-		if ret.IsEmpty() {
-			return n
+		ret, found := n.right.GreatestLowerBound(key)
+		if !found {
+			return n, true
 		}
-		return ret
+		return ret, true
 	}
 
 	if key.Less(n.key) {
 		return n.left.GreatestLowerBound(key)
 	}
 
-	return n
+	return n, true
 }
 
 //Iter returns an in-order iterator for the tree.
@@ -360,11 +373,10 @@ func (n *TreeEx[K, V]) IterGte(glb K) Iterator[Pair[K, V]] {
 	return &ret
 }
 
-//Least returns the key-value-pair for the lowest element in the tree. If the tree is empty, the returned pair
-//is also empty.
-func (n *TreeEx[K, V]) Least() Pair[K, V] {
+//Least returns the key-value-pair for the lowest element in the tree. If the tree is empty, then return false
+func (n *TreeEx[K, V]) Least() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return nil, false
 	}
 
 	var ret = n
@@ -373,14 +385,14 @@ func (n *TreeEx[K, V]) Least() Pair[K, V] {
 		ret = ret.left
 	}
 
-	return ret
+	return ret, true
 }
 
 //Most returns the key-value-pair for the greatest element in the tree. If the tree is empty, the returned pair
 //is also empty
-func (n *TreeEx[K, V]) Most() Pair[K, V] {
+func (n *TreeEx[K, V]) Most() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return nil, false
 	}
 
 	var ret = n
@@ -389,7 +401,7 @@ func (n *TreeEx[K, V]) Most() Pair[K, V] {
 		ret = ret.right
 	}
 
-	return ret
+	return ret, true
 }
 
 func (n *TreeEx[K, V]) MarshalJSON() ([]byte, error) {

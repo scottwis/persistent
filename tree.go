@@ -62,21 +62,35 @@ func (n *Tree[K, V]) IsEmpty() bool {
 	return n == nil || n.size == 0
 }
 
-// Find returns the pair associated with key in the tree. Will return an empty pair if no such item exists.
-func (n *Tree[K, V]) Find(key K) Pair[K, V] {
+// Contains returns true if the tree contains the key.
+func (n *Tree[K, V]) Contains(key K) bool {
+	_, found := n.FindOpt(key)
+	return found
+}
+
+// Find returns the value associated with key in the tree. Will return a zero value if no such item exists.
+func (n *Tree[K, V]) Find(key K) V {
+	value, _ := n.FindOpt(key)
+	return value
+}
+
+// FindOpt returns the value associated with key in the tree. Returns true if found; otherwise false.
+// Zero value is returned when found is false.
+func (n *Tree[K, V]) FindOpt(key K) (V, bool) {
 	if n.IsEmpty() {
-		return n
+		var ret V
+		return ret, false
 	}
 
 	if n.key < key {
-		return n.right.Find(key)
+		return n.right.FindOpt(key)
 	}
 
 	if key < n.key {
-		return n.left.Find(key)
+		return n.left.FindOpt(key)
 	}
 
-	return n
+	return n.value, true
 }
 
 func newNode[K constraints.Ordered, V any](left *Tree[K, V], right *Tree[K, V], key K, value V) *Tree[K, V] {
@@ -277,10 +291,10 @@ func (n *Tree[K, V]) Size() int {
 }
 
 //LeastUpperBound returns the key-value-pair for the smallest node n such that n.Key() >= key. If there is no such
-//node then an empty pair is returned.
-func (n *Tree[K, V]) LeastUpperBound(key K) Pair[K, V] {
+//node then boolean is false.
+func (n *Tree[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return n, false
 	}
 
 	if n.key < key {
@@ -288,38 +302,37 @@ func (n *Tree[K, V]) LeastUpperBound(key K) Pair[K, V] {
 	}
 
 	if key < n.key {
-		ret := n.left.LeastUpperBound(key)
+		ret, found := n.left.LeastUpperBound(key)
 
-		if ret.IsEmpty() {
-			return n
+		if !found {
+			return n, true
 		}
-		return ret
+		return ret, true
 	}
 
-	return n
+	return n, true
 }
 
 //GreatestLowerBound returns the key-value-par for the largest node n such that n.Key() <= key. If there is no such
-//node than an empty pair is returned.
-func (n *Tree[K, V]) GreatestLowerBound(key K) Pair[K, V] {
+//node then boolean is false.
+func (n *Tree[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return n, false
 	}
 
 	if n.key < key {
-		ret := n.right.GreatestLowerBound(key)
-
-		if ret.IsEmpty() {
-			return n
+		ret, found := n.right.GreatestLowerBound(key)
+		if !found {
+			return n, true
 		}
-		return ret
+		return ret, true
 	}
 
 	if key < n.key {
 		return n.left.GreatestLowerBound(key)
 	}
 
-	return n
+	return n, true
 }
 
 //Iter returns an in-order iterator for the tree.
@@ -358,11 +371,11 @@ func (n *Tree[K, V]) IterGte(glb K) Iterator[Pair[K, V]] {
 	return &ret
 }
 
-//Least returns the key-value-pair for the lowest element in the tree. If the tree is empty, the returned pair
-//is also empty.
-func (n *Tree[K, V]) Least() Pair[K, V] {
+//Least returns the key-value-pair for the lowest element in the tree. If the tree is empty then boolean
+//is false
+func (n *Tree[K, V]) Least() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return nil, false
 	}
 
 	var ret = n
@@ -371,14 +384,13 @@ func (n *Tree[K, V]) Least() Pair[K, V] {
 		ret = ret.left
 	}
 
-	return ret
+	return ret, true
 }
 
-//Most returns the key-value-pair for the greatest element in the tree. If the tree is empty, the returned pair
-//is also empty
-func (n *Tree[K, V]) Most() Pair[K, V] {
+//Most returns the key-value-pair for the greatest element in the tree. If the tree is empty then boolean is false
+func (n *Tree[K, V]) Most() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n
+		return nil, false
 	}
 
 	var ret = n
@@ -387,7 +399,7 @@ func (n *Tree[K, V]) Most() Pair[K, V] {
 		ret = ret.right
 	}
 
-	return ret
+	return ret, false
 }
 
 func (n *Tree[K, V]) MarshalJSON() ([]byte, error) {

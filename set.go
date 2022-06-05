@@ -23,7 +23,7 @@ func (s *Set[T]) Contains(elem T) bool {
 	if s != nil {
 		currentRoot = s.tree
 	}
-	return !currentRoot.Find(elem).IsEmpty()
+	return currentRoot.Contains(elem)
 }
 
 //Remove returns the root of a new tree with the given element removed.
@@ -67,8 +67,12 @@ func (s *Set[T]) LeastUpperBound(value T) (e T, ok bool) {
 		return ret, false
 	}
 
-	n := s.tree.LeastUpperBound(value)
-	return n.Key(), !n.IsEmpty()
+	kv, found := s.tree.LeastUpperBound(value)
+	if !found {
+		var ret T
+		return ret, false
+	}
+	return kv.Key(), true
 }
 
 //GreatestLowerBound returns the largest element e in s, such that
@@ -79,8 +83,12 @@ func (s *Set[T]) GreatestLowerBound(value T) (T, bool) {
 		return ret, false
 	}
 
-	n := s.tree.GreatestLowerBound(value)
-	return n.Key(), !n.IsEmpty()
+	kv, found := s.tree.GreatestLowerBound(value)
+	if !found {
+		var ret T
+		return ret, false
+	}
+	return kv.Key(), true
 }
 
 //Size returns the number of elements in the set.
