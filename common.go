@@ -34,6 +34,5 @@ type Iterator[T any] interface {
 // Ordered defines an interface for a custom key type. Any type K defining a Less method can be used with
 // TreeEx[K, V] or OrderedSet[K]. For primitive key types see Tree[K, V] and Set[K]
 type Ordered[T any] interface {
-	comparable
 	Less(rhs T) bool
 }

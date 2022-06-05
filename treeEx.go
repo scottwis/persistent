@@ -1,7 +1,9 @@
 package persistent
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 )
 
 // TreeEx implements a persistent AVL tree for keys implementing the Ordered[K] interface. For built-in
@@ -12,6 +14,9 @@ import (
 // at most O(log(N)) nodes will be replaced in the new tree. The implementation is concurrency safe and non-blocking.
 // A *Tree[K,V] instance may be accessed from multiple go-routines without synchronization. See the docs for Iterator[T]
 // for notes on the concurrent use of iterators.
+//
+// TreeEx also supports json encoding / decoding. To unmarshal a json map into a TreeEx[K,V] the type K should support
+// the encoding.TextUnmarshaler interface. To marshal json, the type K should support conversion to string.
 type TreeEx[K Ordered[K], V any] struct {
 	left   *TreeEx[K, V]
 	right  *TreeEx[K, V]
@@ -393,23 +398,61 @@ func (n *TreeEx[K, V]) Most() Pair[K, V] {
 }
 
 func (n *TreeEx[K, V]) MarshalJSON() ([]byte, error) {
-	m := make(map[K]V)
+	buf := bytes.NewBuffer(nil)
+	_, err := buf.WriteString("{")
+	if err != nil {
+		return nil, err
+	}
+	encoder := json.NewEncoder(buf)
+	first := true
 	iter := n.Iter()
 	for iter.Next() {
-		m[iter.Current().Key()] = iter.Current().Value()
+		if !first {
+			_, err = buf.WriteString(",")
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			first = false
+		}
+
+		key := fmt.Sprint(iter.Current().Key())
+		err = encoder.Encode(key)
+		if err != nil {
+			return nil, err
+		}
+		_, err = buf.WriteString(":")
+		if err != nil {
+			return nil, err
+		}
+		err = encoder.Encode(iter.Current().Value())
+		if err != nil {
+			return nil, err
+		}
 	}
-	return json.Marshal(m)
+	buf.WriteString("}")
+
+	return buf.Bytes(), nil
 }
 
 func (n *TreeEx[K, V]) UnmarshalJSON(data []byte) error {
-	var m map[K]V
+	var m map[string]V
 	err := json.Unmarshal(data, &m)
 	if err != nil {
 		return err
 	}
 	tree := &TreeEx[K, V]{}
-	for k, v := range m {
-		tree = tree.Update(k, v)
+	for strKey, v := range m {
+		jsonStr, err := json.Marshal(strKey)
+		if err != nil {
+			return err
+		}
+		var key K
+		err = json.Unmarshal(jsonStr, &key)
+		if err != nil {
+			return err
+		}
+		tree = tree.Update(key, v)
 	}
 	*n = *tree
 	return nil
