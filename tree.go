@@ -294,7 +294,7 @@ func (n *Tree[K, V]) Size() int {
 //node then boolean is false.
 func (n *Tree[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n, false
+		return n.pair(), false
 	}
 
 	if n.key < key {
@@ -305,25 +305,25 @@ func (n *Tree[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 		ret, found := n.left.LeastUpperBound(key)
 
 		if !found {
-			return n, true
+			return n.pair(), true
 		}
 		return ret, true
 	}
 
-	return n, true
+	return n.pair(), true
 }
 
 //GreatestLowerBound returns the key-value-par for the largest node n such that n.Key() <= key. If there is no such
 //node then boolean is false.
 func (n *Tree[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n, false
+		return n.pair(), false
 	}
 
 	if n.key < key {
 		ret, found := n.right.GreatestLowerBound(key)
 		if !found {
-			return n, true
+			return n.pair(), true
 		}
 		return ret, true
 	}
@@ -332,7 +332,7 @@ func (n *Tree[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 		return n.left.GreatestLowerBound(key)
 	}
 
-	return n, true
+	return n.pair(), true
 }
 
 //Iter returns an in-order iterator for the tree.
@@ -375,7 +375,7 @@ func (n *Tree[K, V]) IterGte(glb K) Iterator[Pair[K, V]] {
 //is false
 func (n *Tree[K, V]) Least() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return nil, false
+		return n.pair(), false
 	}
 
 	var ret = n
@@ -384,13 +384,13 @@ func (n *Tree[K, V]) Least() (Pair[K, V], bool) {
 		ret = ret.left
 	}
 
-	return ret, true
+	return ret.pair(), true
 }
 
 //Most returns the key-value-pair for the greatest element in the tree. If the tree is empty then boolean is false
 func (n *Tree[K, V]) Most() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return nil, false
+		return n.pair(), false
 	}
 
 	var ret = n
@@ -399,14 +399,14 @@ func (n *Tree[K, V]) Most() (Pair[K, V], bool) {
 		ret = ret.right
 	}
 
-	return ret, false
+	return ret.pair(), false
 }
 
 func (n *Tree[K, V]) MarshalJSON() ([]byte, error) {
 	m := make(map[K]V)
 	iter := n.Iter()
 	for iter.Next() {
-		m[iter.Current().Key()] = iter.Current().Value()
+		m[iter.Current().Key] = iter.Current().Value
 	}
 	return json.Marshal(m)
 }
@@ -447,9 +447,13 @@ func (i *TreeIterator[K, V]) Current() Pair[K, V] {
 	if i.current.IsEmpty() {
 		panic("invalid iterator position")
 	}
-	return i.current
+	return i.current.pair()
 }
 
 func EmptyTree[K constraints.Ordered, V any]() *Tree[K, V] {
 	return nil
+}
+
+func (n *Tree[K, V]) pair() Pair[K, V] {
+	return Pair[K, V]{Key: n.Key(), Value: n.Value()}
 }

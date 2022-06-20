@@ -301,7 +301,7 @@ func (n *TreeEx[K, V]) Size() int {
 //node then false is returned.
 func (n *TreeEx[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n, false
+		return n.pair(), false
 	}
 
 	if n.key.Less(key) {
@@ -312,25 +312,25 @@ func (n *TreeEx[K, V]) LeastUpperBound(key K) (Pair[K, V], bool) {
 		ret, found := n.left.LeastUpperBound(key)
 
 		if !found {
-			return n, true
+			return n.pair(), true
 		}
 		return ret, true
 	}
 
-	return n, true
+	return n.pair(), true
 }
 
 //GreatestLowerBound returns the key-value-par for the largest node n such that n.Key() <= key. If there is no such
 //node then false is returned.
 func (n *TreeEx[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return n, false
+		return n.pair(), false
 	}
 
 	if n.key.Less(key) {
 		ret, found := n.right.GreatestLowerBound(key)
 		if !found {
-			return n, true
+			return n.pair(), true
 		}
 		return ret, true
 	}
@@ -339,7 +339,7 @@ func (n *TreeEx[K, V]) GreatestLowerBound(key K) (Pair[K, V], bool) {
 		return n.left.GreatestLowerBound(key)
 	}
 
-	return n, true
+	return n.pair(), true
 }
 
 //Iter returns an in-order iterator for the tree.
@@ -381,7 +381,7 @@ func (n *TreeEx[K, V]) IterGte(glb K) Iterator[Pair[K, V]] {
 //Least returns the key-value-pair for the lowest element in the tree. If the tree is empty, then return false
 func (n *TreeEx[K, V]) Least() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return nil, false
+		return n.pair(), false
 	}
 
 	var ret = n
@@ -390,14 +390,14 @@ func (n *TreeEx[K, V]) Least() (Pair[K, V], bool) {
 		ret = ret.left
 	}
 
-	return ret, true
+	return ret.pair(), true
 }
 
 //Most returns the key-value-pair for the greatest element in the tree. If the tree is empty, the returned pair
 //is also empty
 func (n *TreeEx[K, V]) Most() (Pair[K, V], bool) {
 	if n.IsEmpty() {
-		return nil, false
+		return n.pair(), false
 	}
 
 	var ret = n
@@ -406,7 +406,7 @@ func (n *TreeEx[K, V]) Most() (Pair[K, V], bool) {
 		ret = ret.right
 	}
 
-	return ret, true
+	return ret.pair(), true
 }
 
 func (n *TreeEx[K, V]) MarshalJSON() ([]byte, error) {
@@ -428,7 +428,7 @@ func (n *TreeEx[K, V]) MarshalJSON() ([]byte, error) {
 			first = false
 		}
 
-		key := fmt.Sprint(iter.Current().Key())
+		key := fmt.Sprint(iter.Current().Key)
 		err = encoder.Encode(key)
 		if err != nil {
 			return nil, err
@@ -437,7 +437,7 @@ func (n *TreeEx[K, V]) MarshalJSON() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = encoder.Encode(iter.Current().Value())
+		err = encoder.Encode(iter.Current().Value)
 		if err != nil {
 			return nil, err
 		}
@@ -492,9 +492,13 @@ func (i *TreeExIterator[K, V]) Current() Pair[K, V] {
 	if i.current.IsEmpty() {
 		panic("invalid iterator position")
 	}
-	return i.current
+	return i.current.pair()
 }
 
 func EmptyTreeEx[K Ordered[K], V any]() *TreeEx[K, V] {
 	return nil
+}
+
+func (n *TreeEx[K, V]) pair() Pair[K, V] {
+	return Pair[K, V]{Key: n.Key(), Value: n.Value()}
 }

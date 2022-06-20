@@ -1,12 +1,12 @@
 package persistent
 
-// Pair defines an interface for a Key / Value pair.
-type Pair[K any, V any] interface {
-	// Key Returns the key associated with the pair. Will return the zero value for K if IsEmpty is true.
-	Key() K
+// Pair defines a struct for a Key / Value pair.
+type Pair[K any, V any] struct {
+	// Key is the key associated with the pair.
+	Key K
 
-	// Value Returns the value associated with the pair. Will return the zero value for V if IsEmpty is true.
-	Value() V
+	// Value is the value associated with the pair.
+	Value V
 }
 
 // Iterator defines an interface for an iterator over a persistent data structure.
