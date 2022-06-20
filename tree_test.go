@@ -70,28 +70,28 @@ func TestNilGLB(t *testing.T) {
 	var tree *Tree[int, int]
 	kv, found := tree.GreatestLowerBound(2)
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestEmptyGLB(t *testing.T) {
 	var tree Tree[int, int]
 	kv, found := tree.GreatestLowerBound(2)
 	require.False(t, found)
-	require.Equal(t, &Tree[int, int]{}, kv)
+	require.Zero(t, kv)
 }
 
 func TestNilLUB(t *testing.T) {
 	var tree *Tree[int, int]
 	kv, found := tree.LeastUpperBound(2)
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestEmptyLUB(t *testing.T) {
 	var tree Tree[int, int]
 	kv, found := tree.LeastUpperBound(2)
 	require.False(t, found)
-	require.Equal(t, &Tree[int, int]{}, kv)
+	require.Zero(t, kv)
 }
 
 func TestNilIter(t *testing.T) {
@@ -208,8 +208,8 @@ func TestNilUpdate(t *testing.T) {
 
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, 2, i.Current().Key())
-	require.Equal(t, 3, i.Current().Value())
+	require.Equal(t, 2, i.Current().Key)
+	require.Equal(t, 3, i.Current().Value)
 	require.False(t, i.Next())
 }
 
@@ -235,8 +235,8 @@ func TestEmptyUpdate(t *testing.T) {
 
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, 2, i.Current().Key())
-	require.Equal(t, 3, i.Current().Value())
+	require.Equal(t, 2, i.Current().Key)
+	require.Equal(t, 3, i.Current().Value)
 	require.False(t, i.Next())
 }
 
@@ -311,14 +311,14 @@ func TestLeastUpperBound(t *testing.T) {
 		tree = tree.Update(i, i)
 	}
 	kv, _ := tree.LeastUpperBound(4)
-	require.Equal(t, 4, kv.Value())
+	require.Equal(t, 4, kv.Value)
 	kv, _ = tree.LeastUpperBound(5)
-	require.Equal(t, 6, kv.Value())
+	require.Equal(t, 6, kv.Value)
 	kv, found := tree.LeastUpperBound(22)
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 	kv, _ = tree.LeastUpperBound(-1)
-	require.Equal(t, 0, kv.Value())
+	require.Equal(t, 0, kv.Value)
 }
 
 func TestGreatestLowerBound(t *testing.T) {
@@ -327,14 +327,14 @@ func TestGreatestLowerBound(t *testing.T) {
 		tree = tree.Update(i, i)
 	}
 	kv, _ := tree.GreatestLowerBound(4)
-	require.Equal(t, 4, kv.Value())
+	require.Equal(t, 4, kv.Value)
 	kv, _ = tree.GreatestLowerBound(5)
-	require.Equal(t, 4, kv.Value())
+	require.Equal(t, 4, kv.Value)
 	kv, _ = tree.GreatestLowerBound(22)
-	require.Equal(t, 18, kv.Value())
+	require.Equal(t, 18, kv.Value)
 	kv, found := tree.GreatestLowerBound(-1)
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestIter(t *testing.T) {
@@ -345,7 +345,7 @@ func TestIter(t *testing.T) {
 	iter := tree.Iter()
 	j := 0
 	for iter.Next() {
-		require.Equal(t, j, iter.Current().Value())
+		require.Equal(t, j, iter.Current().Value)
 		j += 2
 	}
 	require.Equal(t, 20, j)
@@ -359,7 +359,7 @@ func TestIterGte(t *testing.T) {
 	iter := tree.IterGte(7)
 	j := 8
 	for iter.Next() {
-		require.Equal(t, j, iter.Current().Value())
+		require.Equal(t, j, iter.Current().Value)
 		j += 2
 	}
 	require.Equal(t, 20, j)
@@ -413,7 +413,7 @@ func TestUnmarshalJson(t *testing.T) {
 	iter := tree.Iter()
 	i := 0
 	for iter.Next() {
-		require.Equal(t, i, iter.Current().Key())
+		require.Equal(t, i, iter.Current().Key)
 		i += 2
 	}
 	require.Equal(t, 20, i)

@@ -72,7 +72,7 @@ func (s *Set[T]) LeastUpperBound(value T) (e T, ok bool) {
 		var ret T
 		return ret, false
 	}
-	return kv.Key(), true
+	return kv.Key, true
 }
 
 //GreatestLowerBound returns the largest element e in s, such that
@@ -88,7 +88,7 @@ func (s *Set[T]) GreatestLowerBound(value T) (T, bool) {
 		var ret T
 		return ret, false
 	}
-	return kv.Key(), true
+	return kv.Key, true
 }
 
 //Size returns the number of elements in the set.
@@ -156,5 +156,5 @@ func (s *SetIterator[T]) Next() bool {
 }
 
 func (s *SetIterator[T]) Current() T {
-	return s.wrapped.Current().Key()
+	return s.wrapped.Current().Key
 }

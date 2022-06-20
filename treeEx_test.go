@@ -89,28 +89,28 @@ func TestExNilGLB(t *testing.T) {
 	var tree *TreeEx[Int, int]
 	kv, found := tree.GreatestLowerBound(2)
 	require.Falsef(t, found, "wtf?")
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestExEmptyGLB(t *testing.T) {
 	var tree TreeEx[Int, int]
 	kv, found := tree.GreatestLowerBound(2)
 	require.Falsef(t, found, "wtf?")
-	require.Equal(t, &TreeEx[Int, int]{}, kv)
+	require.Zero(t, kv)
 }
 
 func TestExNilLUB(t *testing.T) {
 	var tree *TreeEx[Int, int]
 	kv, found := tree.LeastUpperBound(2)
 	require.Falsef(t, found, "wtf?")
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestExEmptyLUB(t *testing.T) {
 	var tree TreeEx[Int, int]
 	kv, found := tree.LeastUpperBound(2)
 	require.Falsef(t, found, "wtf?")
-	require.Equal(t, &TreeEx[Int, int]{}, kv)
+	require.Zero(t, kv)
 }
 
 func TestExNilIter(t *testing.T) {
@@ -181,14 +181,14 @@ func TestExNilLeast(t *testing.T) {
 	var tree *TreeEx[Int, int]
 	kv, found := tree.Least()
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestExEmptyLeast(t *testing.T) {
 	var tree TreeEx[Int, int]
 	kv, found := tree.Least()
 	require.False(t, found)
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 
 }
 
@@ -196,7 +196,7 @@ func TestExNilMost(t *testing.T) {
 	var tree *TreeEx[Int, int]
 	kv, found := tree.Most()
 	require.Falsef(t, found, "wtf?")
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 
 }
 
@@ -204,7 +204,7 @@ func TestExEmptyMost(t *testing.T) {
 	var tree TreeEx[Int, int]
 	kv, found := tree.Most()
 	require.Falsef(t, found, "wtf?")
-	require.Nil(t, kv)
+	require.Zero(t, kv)
 }
 
 func TestExNilUpdate(t *testing.T) {
@@ -231,8 +231,8 @@ func TestExNilUpdate(t *testing.T) {
 	require.Zero(t, v)
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, Int(2), i.Current().Key())
-	require.Equal(t, 3, i.Current().Value())
+	require.Equal(t, Int(2), i.Current().Key)
+	require.Equal(t, 3, i.Current().Value)
 	require.False(t, i.Next())
 }
 
@@ -263,8 +263,8 @@ func TestExEmptyUpdate(t *testing.T) {
 	require.Zero(t, v)
 	i := tree2.Iter()
 	require.True(t, i.Next())
-	require.Equal(t, Int(2), i.Current().Key())
-	require.Equal(t, 3, i.Current().Value())
+	require.Equal(t, Int(2), i.Current().Key)
+	require.Equal(t, 3, i.Current().Value)
 	require.False(t, i.Next())
 }
 
@@ -335,31 +335,31 @@ func TestExRotateLeftRight(t *testing.T) {
 }
 
 func TestExLeastUpperBound(t *testing.T) {
-	var tree *TreeEx[Int, int]
+	tree := EmptyTreeEx[Int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(Int(i), i)
 	}
 	p, _ := tree.LeastUpperBound(4)
-	require.Equal(t, 4, p.Value())
+	require.Equal(t, 4, p.Value)
 	p, _ = tree.LeastUpperBound(5)
-	require.Equal(t, 6, p.Value())
+	require.Equal(t, 6, p.Value)
 	_, found := tree.LeastUpperBound(22)
 	require.False(t, found)
 	p, _ = tree.LeastUpperBound(-1)
-	require.Equal(t, 0, p.Value())
+	require.Equal(t, 0, p.Value)
 }
 
 func TestExGreatestLowerBound(t *testing.T) {
-	var tree *TreeEx[Int, int]
+	tree := EmptyTreeEx[Int, int]()
 	for i := 0; i < 20; i += 2 {
 		tree = tree.Update(Int(i), i)
 	}
 	p, _ := tree.GreatestLowerBound(4)
-	require.Equal(t, 4, p.Value())
+	require.Equal(t, 4, p.Value)
 	p, _ = tree.GreatestLowerBound(5)
-	require.Equal(t, 4, p.Value())
+	require.Equal(t, 4, p.Value)
 	p, _ = tree.GreatestLowerBound(22)
-	require.Equal(t, 18, p.Value())
+	require.Equal(t, 18, p.Value)
 	_, found := tree.GreatestLowerBound(-1)
 	require.False(t, found)
 }
@@ -372,7 +372,7 @@ func TestExIter(t *testing.T) {
 	iter := tree.Iter()
 	j := 0
 	for iter.Next() {
-		require.Equal(t, j, iter.Current().Value())
+		require.Equal(t, j, iter.Current().Value)
 		j += 2
 	}
 	require.Equal(t, 20, j)
@@ -386,7 +386,7 @@ func TestExIterGte(t *testing.T) {
 	iter := tree.IterGte(7)
 	j := 8
 	for iter.Next() {
-		require.Equal(t, j, iter.Current().Value())
+		require.Equal(t, j, iter.Current().Value)
 		j += 2
 	}
 	require.Equal(t, 20, j)
@@ -440,7 +440,7 @@ func TestExUnmarshalJson(t *testing.T) {
 	iter := tree.Iter()
 	i := 0
 	for iter.Next() {
-		require.Equal(t, Int(i), iter.Current().Key())
+		require.Equal(t, Int(i), iter.Current().Key)
 		i += 2
 	}
 	require.Equal(t, 20, i)
