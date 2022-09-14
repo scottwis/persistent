@@ -411,6 +411,27 @@ func TestExDelete(t *testing.T) {
 	require.True(t, tree.IsEmpty())
 }
 
+func TestGetKthEx(t *testing.T) {
+	var tree *TreeEx[Int, int]
+	for i := 0; i < 20; i += 2 {
+		tree = tree.Update(Int(i), i)
+	}
+
+	for i := 0; i < 10; i++ {
+		p, ok := tree.GetKthElement(i)
+		require.True(t, ok)
+		require.Equal(t, i*2, int(p.Key))
+	}
+
+	p, ok := tree.GetKthElement(-1)
+	require.False(t, ok)
+	require.Equal(t, 0, int(p.Key))
+
+	p, ok = tree.GetKthElement(11)
+	require.False(t, ok)
+	require.Equal(t, 0, int(p.Key))
+}
+
 func TestExMarshalJson(t *testing.T) {
 	var tree *TreeEx[Int, int]
 	expected := make(map[int]int)

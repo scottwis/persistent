@@ -434,3 +434,24 @@ func TestUnMarshalJsonStringKey(t *testing.T) {
 	require.Equal(t, 2, x.Find("Hello"))
 	require.Equal(t, 4, x.Find("World"))
 }
+
+func TestGetKth(t *testing.T) {
+	tree := EmptyTree[int, int]()
+	for i := 0; i < 20; i += 2 {
+		tree = tree.Update(i, i)
+	}
+
+	for i := 0; i < 10; i++ {
+		p, ok := tree.GetKthElement(i)
+		require.True(t, ok)
+		require.Equal(t, i*2, p.Key)
+	}
+
+	p, ok := tree.GetKthElement(-1)
+	require.False(t, ok)
+	require.Equal(t, 0, p.Key)
+
+	p, ok = tree.GetKthElement(11)
+	require.False(t, ok)
+	require.Equal(t, 0, p.Key)
+}

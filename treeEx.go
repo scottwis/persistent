@@ -32,6 +32,27 @@ type TreeExIterator[K Ordered[K], V any] struct {
 	current *TreeEx[K, V]
 }
 
+// GetKthElement returns the k'th smallest element in a Tree.
+// If no such element exists, ok will be false.
+func (n *TreeEx[K, V]) GetKthElement(k int) (p Pair[K, V], ok bool) {
+	if n.IsEmpty() {
+		return Pair[K, V]{}, false
+	}
+
+	if k == n.Left().Size() {
+		return Pair[K, V]{
+			Key:   n.key,
+			Value: n.value,
+		}, true
+	}
+
+	if k > n.Left().Size() {
+		return n.Right().GetKthElement(k - (1 + n.Left().Size()))
+	}
+
+	return n.Left().GetKthElement(k)
+}
+
 // Key returns the key associated with the node n. If n is empty, the zero value for K is returned.
 func (n *TreeEx[K, V]) Key() K {
 	if n.IsEmpty() {

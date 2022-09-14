@@ -210,3 +210,24 @@ func TestStringSetMarshalJson(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
+
+func TestSetGetKth(t *testing.T) {
+	var s *Set[int]
+	for i := 0; i < 20; i += 2 {
+		s = s.Add(i)
+	}
+
+	for i := 0; i < 10; i++ {
+		e, ok := s.GetKthElement(i)
+		require.True(t, ok)
+		require.Equal(t, i*2, e)
+	}
+
+	e, ok := s.GetKthElement(-1)
+	require.False(t, ok)
+	require.Equal(t, 0, e)
+
+	e, ok = s.GetKthElement(11)
+	require.False(t, ok)
+	require.Equal(t, 0, e)
+}

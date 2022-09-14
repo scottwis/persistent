@@ -210,3 +210,24 @@ func TestStringSetExMarshalJson(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expected, actual)
 }
+
+func TestSetExGetKth(t *testing.T) {
+	var s *SetEx[Int]
+	for i := 0; i < 20; i += 2 {
+		s = s.Add(Int(i))
+	}
+
+	for i := 0; i < 10; i++ {
+		e, ok := s.GetKthElement(i)
+		require.True(t, ok)
+		require.Equal(t, i*2, int(e))
+	}
+
+	e, ok := s.GetKthElement(-1)
+	require.False(t, ok)
+	require.Equal(t, 0, int(e))
+
+	e, ok = s.GetKthElement(11)
+	require.False(t, ok)
+	require.Equal(t, 0, int(e))
+}

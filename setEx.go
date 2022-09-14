@@ -16,6 +16,13 @@ type SetEx[T Ordered[T]] struct {
 	tree *TreeEx[T, bool]
 }
 
+// GetKthElement returns the k'th smallest element in a set.
+// If no such element exists, ok will be false.
+func (s *SetEx[T]) GetKthElement(k int) (e T, ok bool) {
+	p, ok := s.tree.GetKthElement(k)
+	return p.Key, ok
+}
+
 //Contains return true if the set contains the given element.
 func (s *SetEx[T]) Contains(elem T) bool {
 	var currentRoot *TreeEx[T, bool]
