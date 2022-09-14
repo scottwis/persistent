@@ -17,6 +17,13 @@ type Set[T constraints.Ordered] struct {
 	tree *Tree[T, bool]
 }
 
+// GetKthElement returns the k'th smallest element in a set.
+// If no such element exists, ok will be false.
+func (s *Set[T]) GetKthElement(k int) (e T, ok bool) {
+	p, ok := s.tree.GetKthElement(k)
+	return p.Key, ok
+}
+
 //Contains return true if the set contains the given element.
 func (s *Set[T]) Contains(elem T) bool {
 	var currentRoot *Tree[T, bool]
