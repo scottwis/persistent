@@ -1,5 +1,9 @@
 package persistent
 
+import (
+	"encoding/json"
+)
+
 // Queue implements a persistent queue.
 //
 // Persistent queues are immutable. Each mutating operation will return a pointer to a new queue with the
@@ -72,6 +76,31 @@ func (q *Queue[T]) Size() int {
 		return 0
 	}
 	return q.d.Size() + q.e.Size()
+}
+
+func (q *Queue[T]) MarshalJSON() ([]byte, error) {
+	cur := q
+	var buf []T
+	var item T
+	for !cur.IsEmpty() {
+		item, cur = cur.Dequeue()
+		buf = append(buf, item)
+	}
+	return json.Marshal(buf)
+}
+
+func (q *Queue[T]) UnmarshalJSON(bytes []byte) error {
+	var tmp *Queue[T]
+	var buf []T
+	err := json.Unmarshal(bytes, &buf)
+	if err != nil {
+		return err
+	}
+	for _, b := range buf {
+		tmp = tmp.Enqueue(b)
+	}
+	*q = *tmp
+	return nil
 }
 
 // EmptyQueue returns a new empty queue.

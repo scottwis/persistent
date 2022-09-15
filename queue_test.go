@@ -1,6 +1,7 @@
 package persistent
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -42,4 +43,35 @@ func TestIsEmpty(t *testing.T) {
 	require.False(t, q.IsEmpty())
 	_, q = q.Dequeue()
 	require.True(t, q.IsEmpty())
+}
+
+func TestJsonMarshalQueue(t *testing.T) {
+	q := EmptyQueue[int]().Enqueue(1).Enqueue(2).Enqueue(3)
+	bytes, err := json.Marshal(q)
+	require.NoError(t, err)
+
+	var actual []int
+	err = json.Unmarshal(bytes, &actual)
+	require.NoError(t, err)
+
+	require.Equal(t, []int{1, 2, 3}, actual)
+}
+
+func TestJsonUnMarshalQueue(t *testing.T) {
+	var items = []int{0, 1, 2}
+	bytes, err := json.Marshal(items)
+	require.NoError(t, err)
+
+	var q *Queue[int]
+	err = json.Unmarshal(bytes, &q)
+	require.NoError(t, err)
+	require.False(t, q.IsEmpty())
+	require.Equal(t, 3, q.Size())
+
+	var x int
+	for i := 0; i < 3; i++ {
+		x, q = q.Dequeue()
+		require.Equal(t, i, x)
+	}
+
 }
