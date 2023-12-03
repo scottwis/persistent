@@ -23,7 +23,7 @@ func (s *SetEx[T]) GetKthElement(k int) (e T, ok bool) {
 	return p.Key, ok
 }
 
-//Contains return true if the set contains the given element.
+// Contains return true if the set contains the given element.
 func (s *SetEx[T]) Contains(elem T) bool {
 	var currentRoot *TreeEx[T, bool]
 	if s != nil {
@@ -32,7 +32,7 @@ func (s *SetEx[T]) Contains(elem T) bool {
 	return currentRoot.Contains(elem)
 }
 
-//Remove returns the root of a new tree with the given element removed.
+// Remove returns the root of a new tree with the given element removed.
 func (s *SetEx[T]) Remove(elem T) *SetEx[T] {
 	var currentRoot *TreeEx[T, bool]
 	if s != nil {
@@ -50,7 +50,7 @@ func (s *SetEx[T]) Remove(elem T) *SetEx[T] {
 	return s
 }
 
-//Add returns the root of a new tree with the given element added.
+// Add returns the root of a new tree with the given element added.
 func (s *SetEx[T]) Add(elem T) *SetEx[T] {
 	if s.Contains(elem) {
 		return s
@@ -65,8 +65,8 @@ func (s *SetEx[T]) Add(elem T) *SetEx[T] {
 	}
 }
 
-//LeastUpperBound returns the smallest element e in s, such that
-//value <= e. If no such element exists, ok will be false and e will be set to the zero value for T.
+// LeastUpperBound returns the smallest element e in s, such that
+// value <= e. If no such element exists, ok will be false and e will be set to the zero value for T.
 func (s *SetEx[T]) LeastUpperBound(value T) (e T, ok bool) {
 	if s == nil {
 		var ret T
@@ -81,7 +81,7 @@ func (s *SetEx[T]) LeastUpperBound(value T) (e T, ok bool) {
 	return kv.Key, true
 }
 
-//GreatestLowerBound returns the largest element e in s, such that
+// GreatestLowerBound returns the largest element e in s, such that
 // e <= value. If no such element exists, ok will be false and e will be set to the zero value for T.
 func (s *SetEx[T]) GreatestLowerBound(value T) (T, bool) {
 	if s == nil {
@@ -97,7 +97,7 @@ func (s *SetEx[T]) GreatestLowerBound(value T) (T, bool) {
 	return kv.Key, true
 }
 
-//Size returns the number of elements in the set.
+// Size returns the number of elements in the set.
 func (s *SetEx[T]) Size() int {
 	if s == nil {
 		return 0
@@ -105,7 +105,7 @@ func (s *SetEx[T]) Size() int {
 	return s.tree.Size()
 }
 
-//Iter returns an in-order traversal iterator over the elements in the set.
+// Iter returns an in-order traversal iterator over the elements in the set.
 func (s *SetEx[T]) Iter() Iterator[T] {
 	var currentRoot *TreeEx[T, bool]
 	if s != nil {
@@ -114,7 +114,7 @@ func (s *SetEx[T]) Iter() Iterator[T] {
 	return &SetExIterator[T]{wrapped: currentRoot.Iter()}
 }
 
-//IterGte returns an in-order traversal iterator over all elements x in s that are >= e
+// IterGte returns an in-order traversal iterator over all elements x in s that are >= e
 func (s *SetEx[T]) IterGte(e T) Iterator[T] {
 	var currentRoot *TreeEx[T, bool]
 	if s != nil {
@@ -123,12 +123,12 @@ func (s *SetEx[T]) IterGte(e T) Iterator[T] {
 	return &SetExIterator[T]{wrapped: currentRoot.IterGte(e)}
 }
 
-//IsEmpty returns true iif s is empty.
+// IsEmpty returns true iif s is empty.
 func (s *SetEx[T]) IsEmpty() bool {
 	return s == nil || s.tree.IsEmpty()
 }
 
-//MarshalJSON marshals the set s as a json array.a
+// MarshalJSON marshals the set s as a json array.a
 func (s *SetEx[T]) MarshalJSON() ([]byte, error) {
 	var arr []T
 	iter := s.Iter()
@@ -138,7 +138,7 @@ func (s *SetEx[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(arr)
 }
 
-//UnmarshalJSON unmarshals a json array into s.
+// UnmarshalJSON unmarshals a json array into s.
 func (s *SetEx[T]) UnmarshalJSON(data []byte) error {
 	var arr []T
 	err := json.Unmarshal(data, &arr)
@@ -163,4 +163,8 @@ func (s *SetExIterator[T]) Next() bool {
 
 func (s *SetExIterator[T]) Current() T {
 	return s.wrapped.Current().Key
+}
+
+func EmptySetEx[T Ordered[T]]() *SetEx[T] {
+	return nil
 }
