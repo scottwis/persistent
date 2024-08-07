@@ -231,3 +231,9 @@ func TestSetGetKth(t *testing.T) {
 	require.False(t, ok)
 	require.Equal(t, 0, e)
 }
+
+func TestSetGetKthNil(t *testing.T) {
+	var s *Set[int]
+	_, ok := s.GetKthElement(0)
+	require.False(t, ok)
+}

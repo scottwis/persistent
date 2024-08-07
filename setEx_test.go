@@ -231,3 +231,9 @@ func TestSetExGetKth(t *testing.T) {
 	require.False(t, ok)
 	require.Equal(t, 0, int(e))
 }
+
+func TestSetExGetKeyNil(t *testing.T) {
+	var s *SetEx[Int]
+	_, ok := s.GetKthElement(0)
+	require.False(t, ok)
+}

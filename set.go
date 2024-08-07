@@ -20,6 +20,9 @@ type Set[T constraints.Ordered] struct {
 // GetKthElement returns the k'th smallest element in a set.
 // If no such element exists, ok will be false.
 func (s *Set[T]) GetKthElement(k int) (e T, ok bool) {
+	if s == nil {
+		return e, false
+	}
 	p, ok := s.tree.GetKthElement(k)
 	return p.Key, ok
 }
