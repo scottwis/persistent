@@ -11,11 +11,12 @@ import (
 // concurrency safe and non-blocking. A *Queue[T] instance may be accessed from multiple go-routines without
 // synchronization. Each mutating Queue[T] operation has amortized O(1) cost.
 type Queue[T any] struct {
-	e *Stack[T]
-	d *Stack[T]
+	e       *Stack[T]
+	d       *Stack[T]
+	eBottom T // Tracks the first item added to e
 }
 
-//IsEmpty returns true iif the queue is empty.
+// IsEmpty returns true iif the queue is empty.
 func (q *Queue[T]) IsEmpty() bool {
 	return q == nil || (q.e.IsEmpty() && q.d.IsEmpty())
 }
@@ -36,10 +37,18 @@ func (q *Queue[T]) dequeueStack() *Stack[T] {
 
 // Enqueue returns a new queue with 'value' added to the end. This is O(1).
 func (q *Queue[T]) Enqueue(value T) *Queue[T] {
-	return &Queue[T]{
+	ret := Queue[T]{
 		e: q.enqueueStack().Push(value),
 		d: q.dequeueStack(),
 	}
+
+	if q.enqueueStack().IsEmpty() {
+		ret.eBottom = value
+	} else {
+		ret.eBottom = q.eBottom
+	}
+
+	return &ret
 }
 
 // Dequeue removes the top item from the queue, and returns the dequeued value along with a new queue with the value
@@ -64,10 +73,32 @@ func (q *Queue[T]) Dequeue() (value T, queue *Queue[T]) {
 	if d.IsEmpty() && q.e.IsEmpty() {
 		return v, nil
 	}
-	return v, &Queue[T]{
+	retQueue := &Queue[T]{
 		d: d,
 		e: q.e,
 	}
+
+	if !retQueue.e.IsEmpty() {
+		retQueue.eBottom = q.eBottom
+	}
+	return v, retQueue
+}
+
+// Top returns the top element in the queue without removing it. This is O(1).
+// If the queue is empty, the returned value will be the zero value of T.
+func (q *Queue[T]) Top() T {
+	if q.IsEmpty() {
+		var zv T
+		return zv
+	}
+
+	// If dequeue stack has elements, the top is there
+	if !q.d.IsEmpty() {
+		return q.d.Peek()
+	}
+
+	// Otherwise, the top is the bottom of enqueue stack
+	return q.eBottom
 }
 
 // Size returns the number of elements in 'q'.
